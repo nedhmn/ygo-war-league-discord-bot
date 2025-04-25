@@ -1,6 +1,6 @@
 from app.bot import MyBot
-from app.config import settings
-from app.utils.logging import setup_logger
+from app.core.config import settings
+from app.core.logging import setup_logger
 
 setup_logger(log_file="logs/bot.log")
 

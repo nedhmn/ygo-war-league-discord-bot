@@ -34,4 +34,5 @@ def setup_logger(
     root_logger.addHandler(handler)
 
     # Set specific level for discord.http
+    # ref: https://discordpy.readthedocs.io/en/stable/logging.html
     logging.getLogger("discord.http").setLevel(http_level)
