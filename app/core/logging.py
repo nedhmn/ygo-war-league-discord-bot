@@ -5,7 +5,7 @@ from pathlib import Path
 
 def setup_logger(
     log_file: str,
-    level: int = logging.INFO,
+    level: int = logging.DEBUG,
     http_level: int = logging.INFO,
     max_bytes: int = 32 * 1024 * 1024,
     backup_count: int = 5,
@@ -34,4 +34,5 @@ def setup_logger(
     root_logger.addHandler(handler)
 
     # Set specific level for discord.http
+    # ref: https://discordpy.readthedocs.io/en/stable/logging.html
     logging.getLogger("discord.http").setLevel(http_level)

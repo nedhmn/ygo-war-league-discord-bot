@@ -13,13 +13,15 @@ class MyBot(commands.Bot):
         super().__init__(command_prefix="!", intents=intents)
 
     async def load_cogs(self) -> None:
-        # Auto-load every cog in cogs/*.py except __init__.py
-        for path in Path("app/cogs").glob("*.py"):
-            if path.stem == "__init__":
+        # Load all cogs from the app/cogs directory
+        for folder in Path("app/cogs").iterdir():
+            if not folder.is_dir():
                 continue
-            await self.load_extension(f"app.cogs.{path.stem}")
-        # Sync slash commands once all cogs are loaded
-        await self.tree.sync()
+            # Cogs need to follow path structure app/cogs/foo/foo.py
+            file = folder / f"{folder.name}.py"
+            if not file.exists():
+                continue
+            await self.load_extension(f"app.cogs.{folder.name}.{folder.name}")
 
     async def setup_hook(self) -> None:
         await self.load_cogs()
