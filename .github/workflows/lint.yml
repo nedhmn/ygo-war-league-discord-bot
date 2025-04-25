@@ -4,14 +4,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "*.py"
   pull_request:
     types:
       - opened
       - synchronize
-    paths:
-      - "*.py"
 
 jobs:
   lint:
