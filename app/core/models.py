@@ -2,8 +2,11 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import DeclarativeBase
 
-from app.core.db import Base
+
+class Base(DeclarativeBase):
+    pass
 
 
 class BaseModel(Base):
@@ -20,12 +23,12 @@ class BaseModel(Base):
     )
 
 
-class LeagueDecks(BaseModel):
+class LeagueDeck(BaseModel):
     __tablename__ = "league_decks"
 
     season = Column(Integer)
     week = Column(Integer)
-    submitter_id = Column(String)
+    submitter_id = Column(Integer)
     submitter_name = Column(String)
     team_name = Column(String)
     player_name = Column(String)

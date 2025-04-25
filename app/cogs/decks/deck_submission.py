@@ -5,8 +5,8 @@ import discord
 from discord.ext import commands
 
 from app.cogs.decks.config import DeckSettings
-from app.cogs.decks.models import DeckEntry
 from app.core.exceptions import UserCancelled, UserRetry
+from app.core.models import LeagueDeck
 
 
 class DeckSubmissionSession:
@@ -20,9 +20,9 @@ class DeckSubmissionSession:
         self.user = user
         self.settings = settings
         self.dm_channel: discord.DMChannel | None = None
-        self.entries: list[DeckEntry] = []
+        self.entries: list[LeagueDeck] = []
 
-    async def run(self) -> list[DeckEntry]:
+    async def run(self) -> list[LeagueDeck]:
         await self._ensure_dm()
         assert self.dm_channel is not None
 
@@ -41,7 +41,7 @@ class DeckSubmissionSession:
         if not self.dm_channel:
             self.dm_channel = await self.user.create_dm()
 
-    async def _collect_deck_entry(self, index: int) -> DeckEntry:
+    async def _collect_deck_entry(self, index: int) -> LeagueDeck:
         assert self.dm_channel is not None
 
         # Prompt for the player's name
@@ -84,17 +84,21 @@ class DeckSubmissionSession:
         if not confirmation.content.lower().startswith("y"):
             raise UserRetry(f"User requested to retry deck {index}.")
 
+        # Preparing league_decks entry
+        deck_contents = await self._get_deck_ydk_contents(attachment)
+
         # TODO: Better solution for season and week
-        return DeckEntry(
+        return LeagueDeck(
             season=1,
             week=1,
             submitter_id=self.user.id,
             submitter_name=self.user.name,
+            team_name="team_name",
             player_name=name,
             player_order=index,
             deck_filename=attachment.filename,
             deck_url=attachment.url,
-            created_at=discord.utils.utcnow(),
+            deck_ydk_contents=deck_contents,
         )
 
     async def _ask(self, prompt: str, check: Callable[[discord.Message], bool]) -> Any:
@@ -130,3 +134,7 @@ class DeckSubmissionSession:
             raise UserCancelled("User cancelled the session")
 
         return msg
+
+    async def _get_deck_ydk_contents(self, attachment: discord.Attachment) -> str:
+        file_bytes = await attachment.read()
+        return file_bytes.decode("utf-8")

@@ -7,6 +7,7 @@ from discord.ext import commands
 
 from app.cogs.decks.config import DeckSettings
 from app.cogs.decks.deck_submission import DeckSubmissionSession
+from app.cogs.decks.utils import load_league_decks_to_db
 from app.core.exceptions import UserCancelled
 
 logger = logging.getLogger(__name__)
@@ -35,8 +36,7 @@ class DecksCog(commands.Cog):
 
         try:
             entries = await session.run()
-            logger.info(f"User {interaction.user} submitted {len(entries)} decks.")
-            logger.debug(f"Deck entries: {entries}")
+            await load_league_decks_to_db(entries)
         except (asyncio.TimeoutError, UserCancelled):
             pass
         finally:
