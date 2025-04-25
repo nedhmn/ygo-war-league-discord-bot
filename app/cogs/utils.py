@@ -4,7 +4,7 @@ from discord.ext import commands
 
 
 class UtilsCog(commands.Cog):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @app_commands.command(name="latency", description="Check the bot's latency")
@@ -13,5 +13,5 @@ class UtilsCog(commands.Cog):
         await interaction.response.send_message(f"🏓 Latency: {latency}ms")
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(UtilsCog(bot))

@@ -4,7 +4,7 @@ from discord.ext import commands
 
 
 class DecksCog(commands.Cog):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @app_commands.command(name="decks", description="Get a list of decks")
@@ -19,5 +19,5 @@ class DecksCog(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
 
-async def setup(bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(DecksCog(bot))
