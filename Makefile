@@ -14,8 +14,12 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name "*.pyo" -delete
 
+dev:
+	uv run py -m app.main
+
 # Help command
 help:
 	@echo "Available commands:"
 	@echo "  lint         : Run code formatters and linters"
 	@echo "  clean        : Remove Python cache files and build artifacts"
+	@echo "  dev          : Run the application in development mode"
