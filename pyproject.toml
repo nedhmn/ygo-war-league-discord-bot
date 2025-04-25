@@ -19,8 +19,9 @@ dev = [
 
 [tool.mypy]
 python_version = "3.12"
-strict = true
 files = ["app/**/*.py"]
+plugins = ["pydantic.mypy"]
+strict = true
 
 [tool.ruff]
 target-version = "py312"
