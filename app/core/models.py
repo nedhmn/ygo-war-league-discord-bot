@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -28,6 +28,7 @@ class LeagueSetting(BaseModel):
 
     current_season = Column(Integer, nullable=False, default=0)
     current_week = Column(Integer, nullable=False, default=0)
+    is_active = Column(Boolean, nullable=False, default=False)
 
 
 class LeagueDeck(BaseModel):
