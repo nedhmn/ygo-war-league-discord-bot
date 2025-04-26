@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Boolean, DateTime, Integer, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
@@ -12,36 +12,40 @@ class Base(DeclarativeBase):
 class BaseModel(Base):
     __abstract__ = True
 
-    id = Column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )  # Sqlite doesn't support UUIDs
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at = Column(
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
 
 class LeagueSetting(BaseModel):
     __tablename__ = "league_settings"
 
-    current_season = Column(Integer, nullable=False, default=0)
-    current_week = Column(Integer, nullable=False, default=0)
-    enable_deck_submissions = Column(Boolean, nullable=False, default=False)
+    current_season: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    current_week: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    enable_deck_submissions: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
 
 
 class LeagueDeck(BaseModel):
     __tablename__ = "league_decks"
 
-    season = Column(Integer, nullable=False)
-    week = Column(Integer, nullable=False)
-    submitter_id = Column(Integer, nullable=False)
-    submitter_name = Column(String, nullable=False)
-    team_role_id = Column(Integer, nullable=False)
-    team_name = Column(String, nullable=False)
-    player_name = Column(String, nullable=False)
-    player_order = Column(Integer, nullable=False)
-    deck_filename = Column(String, nullable=False)
-    deck_url = Column(String, nullable=False)
-    deck_ydk_contents = Column(String, nullable=False)
+    season: Mapped[int] = mapped_column(Integer, nullable=False)
+    week: Mapped[int] = mapped_column(Integer, nullable=False)
+    submitter_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    submitter_name: Mapped[str] = mapped_column(String, nullable=False)
+    team_role_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    team_name: Mapped[str] = mapped_column(String, nullable=False)
+    player_name: Mapped[str] = mapped_column(String, nullable=False)
+    player_order: Mapped[int] = mapped_column(Integer, nullable=False)
+    deck_filename: Mapped[str] = mapped_column(String, nullable=False)
+    deck_url: Mapped[str] = mapped_column(String, nullable=False)
+    deck_ydk_contents: Mapped[str] = mapped_column(String, nullable=False)
