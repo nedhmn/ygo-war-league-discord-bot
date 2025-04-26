@@ -20,7 +20,9 @@ class DeckImager:
         composite = await self._create_composite(deck)
         buffer = io.BytesIO()
         composite.save(
-            buffer, format=self.settings.format, quality=self.settings.quality
+            buffer,
+            format=self.settings.IMAGE_FORMAT,
+            quality=self.settings.IMAGE_QUALITY,
         )
 
         return buffer
@@ -46,13 +48,13 @@ class DeckImager:
             sections.append(self._scale_to_width(extra_grid, target_width))
 
         total_height = sum(section.height for section in sections)
-        total_height += self.settings.spacing * (len(sections) - 1)
+        total_height += self.settings.DECK_SPACING * (len(sections) - 1)
         composite = Image.new("RGBA", (target_width, total_height))
         y_offset = 0
 
         for section in sections:
             composite.paste(section, (0, y_offset), section)
-            y_offset += section.height + self.settings.spacing
+            y_offset += section.height + self.settings.DECK_SPACING
 
         return composite
 
@@ -82,7 +84,7 @@ class DeckImager:
 
             # Process image
             img = Image.open(io.BytesIO(response.content)).convert("RGBA")
-            return img.resize(self.settings.card_size, Image.Resampling.LANCZOS)
+            return img.resize(self.settings.CARD_SIZE, Image.Resampling.LANCZOS)
 
         except (Exception, httpx.HTTPStatusError):
             logger.exception("Failed to process image for %s", url)
@@ -90,7 +92,7 @@ class DeckImager:
 
     def _create_main_deck_grid(self, images: list[Image.Image]) -> Image.Image:
         """Create a grid for main deck images arranged with 10 cards per row"""
-        card_w, card_h = self.settings.card_size
+        card_w, card_h = self.settings.CARD_SIZE
         cards_per_row = 10
 
         num_cards = len(images)
@@ -113,7 +115,7 @@ class DeckImager:
 
     def _create_row_grid(self, images: list[Image.Image], columns: int) -> Image.Image:
         """Create a single row grid of images with specified number of columns"""
-        card_w, card_h = self.settings.card_size
+        card_w, card_h = self.settings.CARD_SIZE
 
         grid_w = columns * card_w
         grid = Image.new("RGBA", (grid_w, card_h))
