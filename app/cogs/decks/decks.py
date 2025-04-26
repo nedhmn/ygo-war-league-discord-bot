@@ -22,29 +22,58 @@ class DecksCog(commands.Cog):
     @app_commands.command(name="submit_decks", description="Submit decks")
     @app_commands.checks.has_any_role(*deck_settings.ALLOWED_ROLES)
     async def submit_decks(self, interaction: discord.Interaction) -> None:
+        # User is a guild member because of checks but this ensures for mypy
+        if not isinstance(interaction.user, discord.Member):
+            return
+
+        # Check if user has an active session
         if interaction.user.id in self.active_sessions:
             await interaction.response.send_message(
                 "⚠️ You already have an active submission session.", ephemeral=True
             )
             return
 
+        # Grab all team roles the user has
+        team_roles = [
+            role
+            for role in interaction.user.roles
+            if role.id in deck_settings.TEAM_ROLES
+        ]
+
+        # Check if user has a team role
+        if not team_roles:
+            await interaction.response.send_message(
+                "⚠️ You need to have a team role to submit decks.", ephemeral=True
+            )
+            return
+
+        # Check if user has more than one team role
+        if len(team_roles) > 1:
+            await interaction.response.send_message(
+                "⚠️ You need to have only one team role to submit decks.", ephemeral=True
+            )
+            return
+
+        # Save team role and create a new session
+        team_role: discord.Role = team_roles[0]
         self.active_sessions.add(interaction.user.id)
         await interaction.response.send_message(
             "📬 Check your DMs to submit decks!", ephemeral=True
         )
 
-        async with get_async_db_session() as db_session:
-            session = DeckSubmissionSession(
-                self.bot, interaction.user, db_session, deck_settings
-            )
+        try:
+            async with get_async_db_session() as db_session:
+                submission_session = DeckSubmissionSession(
+                    self.bot, interaction.user, team_role, db_session, deck_settings
+                )
 
-            try:
-                entries = await session.run()
+                entries = await submission_session.run()
                 await load_league_decks_to_db(entries, db_session)
-            except (asyncio.TimeoutError, UserCancelled):
-                pass
-            finally:
-                self.active_sessions.remove(interaction.user.id)
+
+        except (asyncio.TimeoutError, UserCancelled):
+            pass
+        finally:
+            self.active_sessions.remove(interaction.user.id)
 
 
 async def setup(bot: commands.Bot) -> None:

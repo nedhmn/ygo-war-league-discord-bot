@@ -14,11 +14,13 @@ class DeckSubmissionSession:
         self,
         bot: commands.Bot,
         user: discord.User | discord.Member,
+        team_role: discord.Role,
         db_session: AsyncSession,
         settings: DeckSettings,
     ) -> None:
         self.bot = bot
         self.user = user
+        self.team_role = team_role
         self.db_session = db_session
         self.settings = settings
         self.dm_channel: discord.DMChannel | None = None
@@ -56,11 +58,14 @@ class DeckSubmissionSession:
         # Preparing league_decks entry
         deck_contents = await self._get_deck_ydk_contents(deck_file_attachment)
 
-        # TODO: league_team_id should be fetched from the league teams table
+        # TODO: Make season and week dynamic
         return LeagueDeck(
-            league_team_id="dummy_team_role_id",
+            season=1,
+            week=1,
             submitter_id=self.user.id,
             submitter_name=self.user.name,
+            team_role_id=self.team_role.id,
+            team_name=self.team_role.name,
             player_name=player_name,
             player_order=index,
             deck_filename=deck_file_attachment.filename,
