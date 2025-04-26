@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cogs.decks.config import DeckSettings
 from app.core.exceptions import UserCancelled, UserRetry
-from app.core.models import LeagueDeck
+from app.core.models import LeagueDeck, LeagueSetting
 
 
 class DeckSubmissionSession:
@@ -16,13 +16,15 @@ class DeckSubmissionSession:
         user: discord.User | discord.Member,
         team_role: discord.Role,
         db_session: AsyncSession,
-        settings: DeckSettings,
+        deck_settings: DeckSettings,
+        league_settings: LeagueSetting,
     ) -> None:
         self.bot = bot
         self.user = user
         self.team_role = team_role
         self.db_session = db_session
-        self.settings = settings
+        self.deck_settings = deck_settings
+        self.league_settings = league_settings
         self.dm_channel: discord.DMChannel | None = None
 
     async def run(self) -> list[LeagueDeck]:
@@ -31,7 +33,7 @@ class DeckSubmissionSession:
 
         entries: list[LeagueDeck] = []
 
-        while len(entries) < self.settings.NUMBER_OF_DECKS:
+        while len(entries) < self.deck_settings.NUMBER_OF_DECKS:
             try:
                 entry = await self._collect_deck_entry(len(entries) + 1)
                 entries.append(entry)
@@ -58,10 +60,9 @@ class DeckSubmissionSession:
         # Preparing league_decks entry
         deck_contents = await self._get_deck_ydk_contents(deck_file_attachment)
 
-        # TODO: Make season and week dynamic
         return LeagueDeck(
-            season=1,
-            week=1,
+            season=self.league_settings.current_season,
+            week=self.league_settings.current_week,
             submitter_id=self.user.id,
             submitter_name=self.user.name,
             team_role_id=self.team_role.id,
@@ -126,7 +127,7 @@ class DeckSubmissionSession:
             prompt = (
                 prompt + "\n\n"
                 f"(Type `cancel` to abort. You have "
-                f"{self.settings.SESSION_TIMEOUT // 60} minute(s) for this step.)"
+                f"{self.deck_settings.SESSION_TIMEOUT // 60} minute(s) for this step.)"
             )
 
         await self.dm_channel.send(prompt)
@@ -137,7 +138,7 @@ class DeckSubmissionSession:
                 check=lambda m: (
                     m.author == self.user and isinstance(m.channel, discord.DMChannel)
                 ),
-                timeout=self.settings.SESSION_TIMEOUT,
+                timeout=self.deck_settings.SESSION_TIMEOUT,
             )
         except asyncio.TimeoutError:
             await self.dm_channel.send(

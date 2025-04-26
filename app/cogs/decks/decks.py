@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from app.cogs.decks.config import deck_settings
 from app.cogs.decks.deck_submission import DeckSubmissionSession
-from app.cogs.decks.utils import load_league_decks_to_db
+from app.cogs.decks.utils import get_league_settings, load_league_decks_to_db
 from app.core.db import get_async_db_session
 from app.core.exceptions import UserCancelled
 
@@ -24,6 +24,16 @@ class DecksCog(commands.Cog):
     async def submit_decks(self, interaction: discord.Interaction) -> None:
         # User is a guild member because of checks but this ensures for mypy
         if not isinstance(interaction.user, discord.Member):
+            return
+
+        async with get_async_db_session() as db_session:
+            league_settings = await get_league_settings(db_session)
+
+        # Check if the season is active
+        if league_settings is None or not league_settings.is_active:
+            await interaction.response.send_message(
+                "⚠️ Deck submissions are closed.", ephemeral=True
+            )
             return
 
         # Check if user has an active session
@@ -64,7 +74,12 @@ class DecksCog(commands.Cog):
         try:
             async with get_async_db_session() as db_session:
                 submission_session = DeckSubmissionSession(
-                    self.bot, interaction.user, team_role, db_session, deck_settings
+                    bot=self.bot,
+                    user=interaction.user,
+                    team_role=team_role,
+                    db_session=db_session,
+                    deck_settings=deck_settings,
+                    league_settings=league_settings,
                 )
 
                 entries = await submission_session.run()
