@@ -86,14 +86,13 @@ class DecksCog(commands.Cog):
             )
             return
 
-        # Grab all team roles the user has
         team_roles = [
             role
             for role in interaction.user.roles
             if role.id in deck_settings.TEAM_ROLES
         ]
 
-        # Check if user has a team role
+        # Check if user has an authorized team role
         if not team_roles:
             await interaction.response.send_message(
                 "⚠️ You need to have a team role to submit decks.", ephemeral=True
@@ -107,7 +106,6 @@ class DecksCog(commands.Cog):
             )
             return
 
-        # Save team role and create a new session
         team_role: discord.Role = team_roles[0]
         self.active_sessions.add(interaction.user.id)
         await interaction.response.send_message(

@@ -5,6 +5,7 @@ from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cogs.decks.config import DeckSettings
+from app.cogs.decks.utils import has_team_submitted
 from app.core.exceptions import UserCancelled, UserRetry
 from app.core.models import LeagueDeck, LeagueSetting
 
@@ -28,11 +29,16 @@ class DeckSubmissionSession:
         self.dm_channel: discord.DMChannel | None = None
 
     async def run(self) -> list[LeagueDeck]:
+        # Create dm with user
         if not self.dm_channel:
             self.dm_channel = await self.user.create_dm()
 
+        # Check if team has submitted and confirm resubmission
+        await self._deck_resubmission_handler()
+
         entries: list[LeagueDeck] = []
 
+        # Collect submission
         while len(entries) < self.deck_settings.NUMBER_OF_DECKS:
             try:
                 entry = await self._collect_deck_entry(len(entries) + 1)
@@ -44,13 +50,46 @@ class DeckSubmissionSession:
         await self.dm_channel.send("✅ **All decks received. Thanks!**")
         return entries
 
+    async def _deck_resubmission_handler(self) -> None:
+        assert self.dm_channel is not None
+
+        team_submitted = await has_team_submitted(
+            self.db_session, self.league_settings, self.team_role.id
+        )
+
+        if not team_submitted:
+            return
+
+        while True:
+            msg = await self._ask(
+                f"🔔 **Existing Submission Detected**\n"
+                f"Your team **{self.team_role.name}** has already submitted decks for "
+                f"Season **{self.league_settings.current_season}** and Week "
+                f"**{self.league_settings.current_week}**.\n\n"
+                "Do you want to update your previous submission? (yes/no)"
+            )
+            confirmation = msg.content.lower().strip()
+
+            if confirmation in ("yes", "y"):
+                await self.dm_channel.send("✅ **Submission update confirmed.**")
+                return
+
+            if confirmation in ("no", "n"):
+                await self.dm_channel.send(
+                    "🚫 **Submission update cancelled.** "
+                    "Your previous submission remains unchanged."
+                )
+                raise UserCancelled("User chose not to update their submission.")
+
+            await self.dm_channel.send(
+                "❗ **Invalid response. Please type `yes` or `no`.**"
+            )
+
     async def _collect_deck_entry(self, index: int) -> LeagueDeck:
         assert self.dm_channel is not None
 
-        # Prompt for the player's name
+        # Get player name and deck
         player_name = await self._get_player_name(index)
-
-        # Prompt for the .ydk file
         deck_file_attachment = await self._get_deck_file_attachment()
 
         # Confirm the submission
@@ -89,7 +128,7 @@ class DeckSubmissionSession:
 
             if not file_msg.attachments:
                 await self.dm_channel.send(
-                    "❗ Please **attach** a `.ydk` file. Text messages alone won't work."
+                    "❗ **Invalid response. Please **attach** a `.ydk` file."
                 )
                 continue
 
