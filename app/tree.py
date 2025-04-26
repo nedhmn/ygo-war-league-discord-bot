@@ -15,6 +15,10 @@ class MyCommandTree(discord.app_commands.CommandTree):
         """App commands error handler"""
         if isinstance(error, exceptions.UnathorizedGuild):
             message = "❌ Command not available in this server."
+        elif isinstance(error, discord.app_commands.errors.MissingAnyRole):
+            message = "❌ You don't have the required role to use this command."
+        elif isinstance(error, discord.app_commands.errors.NoPrivateMessage):
+            message = "❌ This command cannot be used in DMs."
         else:
             raise error
 
