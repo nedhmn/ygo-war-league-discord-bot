@@ -7,4 +7,4 @@ setup_logger(log_file="logs/bot.log")
 
 if __name__ == "__main__":
     bot = MyBot()
-    bot.run(settings.BOT_TOKEN, log_handler=None)
+    bot.run(token=settings.BOT_TOKEN, log_handler=None)

@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,6 +10,11 @@ class Settings(BaseSettings):
     )
 
     BOT_TOKEN: str
+    DATABASE_URL: str
+    ALLOWED_GUILDS: list[int] = Field(
+        default=[], description="List of allowed guild IDs"
+    )
 
 
-settings = Settings()
+# TODO: Make this dynamic and with guild name
+settings = Settings(ALLOWED_GUILDS=[1364794587704594462])
