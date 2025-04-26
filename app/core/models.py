@@ -28,7 +28,7 @@ class LeagueSetting(BaseModel):
 
     current_season = Column(Integer, nullable=False, default=0)
     current_week = Column(Integer, nullable=False, default=0)
-    is_active = Column(Boolean, nullable=False, default=False)
+    enable_deck_submissions = Column(Boolean, nullable=False, default=False)
 
 
 class LeagueDeck(BaseModel):
