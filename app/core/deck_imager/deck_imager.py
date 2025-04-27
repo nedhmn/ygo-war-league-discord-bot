@@ -7,6 +7,7 @@ from PIL import Image
 
 from app.core.deck_imager.config import DeckImagerSetting
 from app.core.deck_imager.models import Decklist
+from app.core.exceptions import InvalidDecklist
 
 logger = logging.getLogger(__name__)
 
@@ -86,9 +87,9 @@ class DeckImager:
             img = Image.open(io.BytesIO(response.content)).convert("RGBA")
             return img.resize(self.settings.CARD_SIZE, Image.Resampling.LANCZOS)
 
-        except (Exception, httpx.HTTPStatusError):
+        except httpx.HTTPStatusError:
             logger.exception("Failed to process image for %s", url)
-            raise
+            raise InvalidDecklist
 
     def _create_main_deck_grid(self, images: list[Image.Image]) -> Image.Image:
         """Create a grid for main deck images arranged with 10 cards per row"""

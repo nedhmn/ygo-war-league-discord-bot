@@ -12,7 +12,7 @@ from app.cogs.decks.utils import (
     has_team_submitted,
     save_deck_image,
 )
-from app.core.exceptions import UserCancelled, UserRetry
+from app.core.exceptions import InvalidDecklist, UserCancelled, UserRetry
 from app.core.models import LeagueDeck, LeagueSetting
 
 
@@ -174,11 +174,17 @@ class DeckSubmissionSession:
             f"**Deck File:** {deck_file_attachment.filename}"
         )
 
-        async with self.dm_channel.typing():
-            image_buffer = await get_deck_image_buffer(deck_ydk_content)
-            image_buffer.seek(0)
-            deck_image_file = discord.File(image_buffer, "deck_preview.webp")
-            embed.set_image(url="attachment://deck_preview.webp")
+        try:
+            async with self.dm_channel.typing():
+                image_buffer = await get_deck_image_buffer(deck_ydk_content)
+                image_buffer.seek(0)
+                deck_image_file = discord.File(image_buffer, "deck_preview.webp")
+                embed.set_image(url="attachment://deck_preview.webp")
+        except InvalidDecklist:
+            await self.dm_channel.send(
+                "🚫 **Illegal decklist.** Must be for HAT format."
+            )
+            raise UserRetry
 
         confirm_msg = await self.dm_channel.send(embed=embed, file=deck_image_file)
 
