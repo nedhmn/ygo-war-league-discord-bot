@@ -8,12 +8,14 @@ from discord.ext import commands
 from app.cogs.decks.config import deck_settings
 from app.cogs.decks.deck_submission import DeckSubmissionSession
 from app.cogs.decks.utils import (
+    get_available_seasons,
     get_league_settings,
     load_league_decks_to_db,
     update_league_deck_submission_status,
     update_league_season,
     update_league_week,
 )
+from app.cogs.decks.view import SeasonSelectView
 from app.core.db import get_async_db_session
 from app.core.exceptions import UserCancelled
 
@@ -130,6 +132,29 @@ class DecksCog(commands.Cog):
             pass
         finally:
             self.active_sessions.remove(interaction.user.id)
+
+    @app_commands.command(
+        name="get_team_submission",
+        description="Get a team's submission by season and week",
+    )
+    @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
+    async def get_team_submission(self, interaction: discord.Interaction) -> None:
+        # Get available seasons
+        async with get_async_db_session() as db_session:
+            available_seasons = await get_available_seasons(db_session)
+
+        if not available_seasons:
+            interaction.response.send_message("❗ **No available seasons!**")
+            return
+
+        options: list[discord.SelectOption] = [
+            discord.SelectOption(label=season, value=season)
+            for season in available_seasons
+        ]
+        season_select_view = SeasonSelectView(options)
+        await interaction.response.send_message(
+            content="Select a season:", view=season_select_view
+        )
 
 
 async def setup(bot: commands.Bot) -> None:

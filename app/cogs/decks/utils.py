@@ -1,8 +1,9 @@
 import io
+from typing import Sequence
 
 import aiofiles
 import discord
-from sqlalchemy import delete, exists, select
+from sqlalchemy import delete, distinct, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deck_imager.config import (
@@ -94,3 +95,10 @@ async def save_deck_attachment(attachment: discord.Attachment, filename: str) ->
 
     async with aiofiles.open(filename, "wb") as f:
         await f.write(image_bytes)
+
+
+async def get_available_seasons(db_session: AsyncSession) -> Sequence[int]:
+    stmt = select(distinct(LeagueDeck.season))
+
+    unique_seasons = await db_session.execute(stmt)
+    return unique_seasons.scalars().all()
