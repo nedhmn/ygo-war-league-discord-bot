@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import uuid
 
 import discord
@@ -6,13 +7,16 @@ from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cogs.decks.config import DeckSettings
+from app.cogs.decks.models import ConfirmationDetails
 from app.cogs.decks.utils import (
     get_deck_image_buffer,
     has_team_submitted,
-    save_deck_attachment,
+    save_deck_image,
 )
 from app.core.exceptions import UserCancelled, UserRetry
 from app.core.models import LeagueDeck, LeagueSetting
+
+logger = logging.getLogger(__name__)
 
 
 class DeckSubmissionSession:
@@ -65,12 +69,15 @@ class DeckSubmissionSession:
         if not team_submitted:
             return
 
+        await self.dm_channel.send(
+            f"🔔 **Existing Submission Detected**\n"
+            f"Your team **{self.team_role.name}** has already submitted decks for "
+            f"Season **{self.league_settings.current_season}** and Week "
+            f"**{self.league_settings.current_week}**."
+        )
+
         while True:
             msg = await self._ask(
-                f"🔔 **Existing Submission Detected**\n"
-                f"Your team **{self.team_role.name}** has already submitted decks for "
-                f"Season **{self.league_settings.current_season}** and Week "
-                f"**{self.league_settings.current_week}**.\n\n"
                 "Do you want to update your previous submission? (yes/no)"
             )
             confirmation = msg.content.lower().strip()
@@ -99,17 +106,14 @@ class DeckSubmissionSession:
         deck_ydk_content = await self._get_deck_ydk_content(deck_file_attachment)
 
         # Confirm the submission
-        confirmed_deck_attachment = await self._get_confirmed_deck(
+        confirmation_details = await self._get_confirmation_details(
             index, player_name, deck_file_attachment, deck_ydk_content
         )
-
-        if not isinstance(confirmed_deck_attachment, discord.Attachment):
-            raise UserRetry(f"User requested to retry deck {index}.")
 
         # Save deck image locally
         deck_image_filename = f"{uuid.uuid4()}.webp"
         deck_image_path = f"data/decks/{deck_image_filename}"
-        await save_deck_attachment(confirmed_deck_attachment, deck_image_path)
+        await save_deck_image(confirmation_details.image_bytes, deck_image_path)
 
         return LeagueDeck(
             season=self.league_settings.current_season,
@@ -122,7 +126,7 @@ class DeckSubmissionSession:
             player_order=index,
             deck_filename=deck_file_attachment.filename,
             deck_ydk_url=deck_file_attachment.url,
-            deck_image_url=confirmed_deck_attachment.url,
+            deck_image_url=confirmation_details.url,
             deck_image_path=deck_image_path,
             deck_ydk_content=deck_ydk_content,
         )
@@ -135,60 +139,69 @@ class DeckSubmissionSession:
 
     async def _get_deck_file_attachment(self) -> discord.Attachment:
         assert self.dm_channel is not None
+
         while True:
             file_msg = await self._ask(
                 "📎 **Upload your deck file**\nPlease attach your `.ydk` file."
             )
 
             if not file_msg.attachments:
-                await self.dm_channel.send(
-                    "❗ **Invalid response. Please **attach** a `.ydk` file."
-                )
+                await self.dm_channel.send("❌ **Invalid file type.**")
                 continue
 
             attachment = file_msg.attachments[0]
+
             if not attachment.filename.lower().endswith(".ydk"):
-                await self.dm_channel.send("❌ **Invalid file type.**\n\n")
+                await self.dm_channel.send("❌ **Invalid file type.**")
                 continue
 
             return attachment
 
-    async def _get_confirmed_deck(
+    async def _get_confirmation_details(
         self,
         index: int,
         player_name: str,
         deck_file_attachment: discord.Attachment,
         deck_ydk_content: str,
-    ) -> discord.Attachment | None:
+    ) -> ConfirmationDetails:
         assert self.dm_channel is not None
 
-        await self.dm_channel.send("🔔 **Confirm Your Submission**")
+        # Build confirmation embed
+        embed = discord.Embed(
+            title="Confirm Your Submission", color=discord.Color.blurple()
+        )
 
-        await self.dm_channel.send(
-            f"> **Order:** {index}\n"
-            f"> **Player Name:** {player_name}\n"
-            f"> **Deck File:** {deck_file_attachment.filename}"
+        embed.description = (
+            f"**Order:** {index}\n"
+            f"**Player Name:** {player_name}\n"
+            f"**Deck File:** {deck_file_attachment.filename}"
         )
 
         async with self.dm_channel.typing():
             image_buffer = await get_deck_image_buffer(deck_ydk_content)
             image_buffer.seek(0)
             deck_image_file = discord.File(image_buffer, "deck_preview.webp")
+            embed.set_image(url="attachment://deck_preview.webp")
 
-        deck_image_msg = await self.dm_channel.send(
-            file=deck_image_file,
-        )
+        confirm_msg = await self.dm_channel.send(embed=embed, file=deck_image_file)
 
+        # Ask confirmation until a valid response is provided.
         while True:
             confirmation = await self._ask("Type `yes` to confirm or `no` to retry.")
+            response = confirmation.content.lower().strip()
 
-            if confirmation.content.lower() in ("yes", "y"):
-                return deck_image_msg.attachments[0]
+            if response in ("yes", "y"):
+                return ConfirmationDetails(
+                    url=confirm_msg.embeds[0].image.url,
+                    image_bytes=image_buffer,
+                )
 
-            if confirmation.content.lower() in ("no", "n"):
-                return None
+            if response in ("no", "n"):
+                raise UserRetry(f"User requested to retry deck {index}.")
 
-            await self.dm_channel.send("❗ **Invalid response.**")
+            await self.dm_channel.send(
+                "❗ **Invalid response**. Please type `yes` or `no`."
+            )
 
     async def _ask(self, prompt: str, add_reminder: bool = True) -> discord.Message:
         assert self.dm_channel is not None

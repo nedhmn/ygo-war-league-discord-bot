@@ -89,12 +89,10 @@ async def get_deck_image_buffer(deck_ydk_content: str) -> io.BytesIO:
     return await deck_imager.generate_deck_image(decklist)
 
 
-async def save_deck_attachment(attachment: discord.Attachment, filename: str) -> None:
+async def save_deck_image(image_bytes: io.BytesIO, filename: str) -> None:
     """Save deck image locally"""
-    image_bytes = await attachment.read()
-
     async with aiofiles.open(filename, "wb") as f:
-        await f.write(image_bytes)
+        await f.write(image_bytes.getvalue())
 
 
 async def get_available_seasons(db_session: AsyncSession) -> Sequence[int]:
