@@ -27,7 +27,9 @@ class DecksCog(commands.Cog):
         self.bot = bot
         self.active_sessions: set[int] = set()
 
-    @app_commands.command(name="set_season", description="Sets the current season")
+    @app_commands.command(
+        name="set_season", description="Mod only - Sets the current season"
+    )
     @app_commands.describe(season="The season to set")
     @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
     async def set_season(self, interaction: discord.Interaction, season: int) -> None:
@@ -38,7 +40,9 @@ class DecksCog(commands.Cog):
             f"✅ Season has been updated to **{season}**!"
         )
 
-    @app_commands.command(name="set_week", description="Sets the current week")
+    @app_commands.command(
+        name="set_week", description="Mod only - Sets the current week"
+    )
     @app_commands.describe(week="The week to set")
     @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
     async def set_week(self, interaction: discord.Interaction, week: int) -> None:
@@ -50,7 +54,8 @@ class DecksCog(commands.Cog):
         )
 
     @app_commands.command(
-        name="enable_deck_submissions", description="Enables deck submissions"
+        name="enable_deck_submissions",
+        description="Mod only - Enables deck submissions",
     )
     @app_commands.describe(enable="Enable deck submissions")
     @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
@@ -133,7 +138,7 @@ class DecksCog(commands.Cog):
 
     @app_commands.command(
         name="get_team_submission",
-        description="Get a team's submission by season and week",
+        description="Mod only - Get a team's submission by season and week",
     )
     @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
     async def get_team_submission(self, interaction: discord.Interaction) -> None:
@@ -146,8 +151,7 @@ class DecksCog(commands.Cog):
             return
 
         options = [
-            discord.SelectOption(label=season, value=season)
-            for season in str(available_seasons)
+            discord.SelectOption(label=str(season)) for season in available_seasons
         ]
         season_select_view = SeasonSelectView(options)
 

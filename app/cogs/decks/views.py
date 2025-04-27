@@ -32,10 +32,7 @@ class SeasonSelect(discord.ui.Select[Any]):
                 db_session, selected_season
             )
 
-        options = [
-            discord.SelectOption(label=week, value=week)
-            for week in str(available_weeks)
-        ]
+        options = [discord.SelectOption(label=str(week)) for week in available_weeks]
         week_select_view = WeekSelectView(options, selected_season)
 
         await interaction.response.send_message(
@@ -64,10 +61,7 @@ class WeekSelect(discord.ui.Select[Any]):
                 db_session, self.season, selected_week
             )
 
-        options = [
-            discord.SelectOption(label=team, value=team)
-            for team in str(available_teams)
-        ]
+        options = [discord.SelectOption(label=team) for team in available_teams]
         team_select_view = TeamSelectView(options, self.season, selected_week)
 
         await interaction.response.send_message(

@@ -2,6 +2,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from app.core.config import settings
+
 
 class UtilsCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -14,4 +16,5 @@ class UtilsCog(commands.Cog):
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(UtilsCog(bot))
+    if settings.ENVIORNMENT == "local":
+        await bot.add_cog(UtilsCog(bot))
