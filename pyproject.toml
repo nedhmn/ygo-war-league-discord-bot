@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.11.3",
     "pydantic-settings>=2.9.1",
     "sqlalchemy>=2.0.40",
+    "types-aiofiles>=24.1.0.20250326",
 ]
 
 [dependency-groups]
