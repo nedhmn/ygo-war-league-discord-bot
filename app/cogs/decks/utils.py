@@ -98,7 +98,20 @@ async def save_deck_attachment(attachment: discord.Attachment, filename: str) ->
 
 
 async def get_available_seasons(db_session: AsyncSession) -> Sequence[int]:
-    stmt = select(distinct(LeagueDeck.season))
-
-    unique_seasons = await db_session.execute(stmt)
+    unique_seasons = await db_session.execute(select(distinct(LeagueDeck.season)))
     return unique_seasons.scalars().all()
+
+
+async def get_available_weeks_by_season(
+    db_session: AsyncSession, season: int
+) -> Sequence[int]:
+    unique_weeks = await db_session.execute(
+        select(distinct(LeagueDeck.week)).where(LeagueDeck.season == season)
+    )
+    return unique_weeks.scalars().all()
+
+
+async def get_available_teams_by_season_and_week(
+    db_session: AsyncSession, season: int, week: int
+) -> None:
+    pass

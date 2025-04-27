@@ -147,11 +147,12 @@ class DecksCog(commands.Cog):
             interaction.response.send_message("❗ **No available seasons!**")
             return
 
-        options: list[discord.SelectOption] = [
+        options = [
             discord.SelectOption(label=season, value=season)
             for season in available_seasons
         ]
         season_select_view = SeasonSelectView(options)
+
         await interaction.response.send_message(
             content="Select a season:", view=season_select_view
         )
