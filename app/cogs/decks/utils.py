@@ -120,3 +120,18 @@ async def get_available_teams_by_season_and_week(
         )
     )
     return unique_teams.scalars().all()
+
+
+async def get_team_submission_by_season_and_week(
+    db_session: AsyncSession, season: int, week: int, team_name: str
+) -> Sequence[LeagueDeck]:
+    team_submission = await db_session.execute(
+        select(LeagueDeck)
+        .where(
+            LeagueDeck.season == season,
+            LeagueDeck.week == week,
+            LeagueDeck.team_name == team_name,
+        )
+        .order_by(LeagueDeck.player_order)
+    )
+    return team_submission.scalars().all()
