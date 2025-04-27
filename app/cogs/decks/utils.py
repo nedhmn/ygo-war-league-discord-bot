@@ -1,8 +1,8 @@
 import io
+from typing import Sequence
 
 import aiofiles
-import discord
-from sqlalchemy import delete, exists, select
+from sqlalchemy import delete, distinct, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deck_imager.config import (
@@ -88,9 +88,47 @@ async def get_deck_image_buffer(deck_ydk_content: str) -> io.BytesIO:
     return await deck_imager.generate_deck_image(decklist)
 
 
-async def save_deck_attachment(attachment: discord.Attachment, filename: str) -> None:
+async def save_deck_image(image_bytes: io.BytesIO, filename: str) -> None:
     """Save deck image locally"""
-    image_bytes = await attachment.read()
-
     async with aiofiles.open(filename, "wb") as f:
-        await f.write(image_bytes)
+        await f.write(image_bytes.getvalue())
+
+
+async def get_available_seasons(db_session: AsyncSession) -> Sequence[int]:
+    unique_seasons = await db_session.execute(select(distinct(LeagueDeck.season)))
+    return unique_seasons.scalars().all()
+
+
+async def get_available_weeks_by_season(
+    db_session: AsyncSession, season: int
+) -> Sequence[int]:
+    unique_weeks = await db_session.execute(
+        select(distinct(LeagueDeck.week)).where(LeagueDeck.season == season)
+    )
+    return unique_weeks.scalars().all()
+
+
+async def get_available_teams_by_season_and_week(
+    db_session: AsyncSession, season: int, week: int
+) -> Sequence[str]:
+    unique_teams = await db_session.execute(
+        select(distinct(LeagueDeck.team_name)).where(
+            LeagueDeck.season == season, LeagueDeck.week == week
+        )
+    )
+    return unique_teams.scalars().all()
+
+
+async def get_team_submission_by_season_and_week(
+    db_session: AsyncSession, season: int, week: int, team_name: str
+) -> Sequence[LeagueDeck]:
+    team_submission = await db_session.execute(
+        select(LeagueDeck)
+        .where(
+            LeagueDeck.season == season,
+            LeagueDeck.week == week,
+            LeagueDeck.team_name == team_name,
+        )
+        .order_by(LeagueDeck.player_order)
+    )
+    return team_submission.scalars().all()
