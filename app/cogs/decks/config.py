@@ -35,7 +35,6 @@ class DeckSettings(BaseSettings):
     NUMBER_OF_DECKS: int = Field(default=5, description="Number of decks to submit")
 
 
-deck_settings = DeckSettings()
+NUMBER_OF_DECKS = 5 if settings.ENVIORNMENT == "production" else 2
 
-if settings.ENVIORNMENT == "local":
-    deck_settings.NUMBER_OF_DECKS = 2
+deck_settings = DeckSettings(NUMBER_OF_DECKS=NUMBER_OF_DECKS)
