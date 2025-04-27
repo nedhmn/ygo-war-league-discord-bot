@@ -2,6 +2,7 @@ from typing import Annotated
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+from app.core.config import settings
 
 
 class DeckSettings(BaseSettings):
@@ -31,7 +32,10 @@ class DeckSettings(BaseSettings):
     SESSION_TIMEOUT: int = Field(
         default=60 * 2, description="Timeout for the deck submission session in seconds"
     )
-    NUMBER_OF_DECKS: int = Field(default=2, description="Number of decks to submit")
+    NUMBER_OF_DECKS: int = Field(default=5, description="Number of decks to submit")
 
 
 deck_settings = DeckSettings()
+
+if settings.ENVIORNMENT == "local":
+    deck_settings.NUMBER_OF_DECKS = 2
