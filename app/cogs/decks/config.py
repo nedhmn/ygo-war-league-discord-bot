@@ -13,15 +13,12 @@ class DeckSettings(BaseSettings):
 
     ADMIN_ROLES: Annotated[list[int], NoDecode] = Field(
         description="List of admin roles for deck submission",
-        examples="role1,role2,role3",
     )
     ALLOWED_ROLES: Annotated[list[int], NoDecode] = Field(
         description="List of allowed roles for deck submission",
-        examples="role1,role2,role3",
     )
     TEAM_ROLES: Annotated[list[int], NoDecode] = Field(
         description="List of team roles for deck submission",
-        examples="role1,role2,role3",
     )
 
     # Set roles in env as csv and parse as list
