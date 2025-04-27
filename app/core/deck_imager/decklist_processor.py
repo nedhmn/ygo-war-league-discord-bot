@@ -45,8 +45,9 @@ class DecklistProcessor:
 
     def _map_card_ids_to_urls(self, card_ids: list[str]) -> list[str]:
         """Convert card ids to urls"""
+        # Transforming card_id to int to remove first 0. This is because hatformatmeta's id did the same.
         return [
-            f"{self.settings.CARD_IMAGE_BASE_URL}{card_id}{self.settings.CARD_IMAGE_FORMAT}"
+            f"{self.settings.CARD_IMAGE_BASE_URL}{int(card_id)}{self.settings.CARD_IMAGE_FORMAT}"
             for card_id in card_ids
         ]
 

@@ -16,7 +16,7 @@ class MyCommandTree(discord.app_commands.CommandTree):
         elif isinstance(error, discord.app_commands.errors.NoPrivateMessage):
             message = "❌ This command cannot be used in DMs."
         else:
-            message = "❌ Unexpected error."
+            raise error
 
         if interaction.response.is_done():
             await interaction.followup.send(message)
