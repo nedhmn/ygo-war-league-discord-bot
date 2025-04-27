@@ -2,7 +2,10 @@ from typing import Any
 
 import discord
 
-from app.cogs.decks.utils import get_available_weeks_by_season
+from app.cogs.decks.utils import (
+    get_available_teams_by_season_and_week,
+    get_available_weeks_by_season,
+)
 from app.core.db import get_async_db_session
 
 
@@ -52,16 +55,38 @@ class WeekSelect(discord.ui.Select[Any]):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         selected_week = int(self.values[0])
+        async with get_async_db_session() as db_session:
+            available_teams = await get_available_teams_by_season_and_week(
+                db_session, self.season, selected_week
+            )
+
+        options = [
+            discord.SelectOption(label=team, value=team) for team in available_teams
+        ]
+        team_select_view = TeamSelectView(options)
 
         await interaction.response.send_message(
-            f"Selected week is {selected_week} and season is {self.season}",
-            ephemeral=True,
+            content="Select a team:", view=team_select_view
         )
 
 
 class TeamSelectView(discord.ui.View):
-    pass
+    def __init__(self, options: list[discord.SelectOption]) -> None:
+        super().__init__()
+        self.add_item(TeamSelect(options))
 
 
 class TeamSelect(discord.ui.Select[Any]):
-    pass
+    def __init__(self, options: list[discord.SelectOption]) -> None:
+        super().__init__(
+            placeholder="Select a team",
+            options=options,
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        selected_team = self.values[0]
+
+        await interaction.response.send_message(
+            f"Selected team is {selected_team}",
+            ephemeral=True,
+        )

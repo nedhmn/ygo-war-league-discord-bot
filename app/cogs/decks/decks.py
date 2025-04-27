@@ -15,7 +15,7 @@ from app.cogs.decks.utils import (
     update_league_season,
     update_league_week,
 )
-from app.cogs.decks.view import SeasonSelectView
+from app.cogs.decks.views import SeasonSelectView
 from app.core.db import get_async_db_session
 from app.core.exceptions import UserCancelled
 

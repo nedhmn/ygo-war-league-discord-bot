@@ -113,5 +113,10 @@ async def get_available_weeks_by_season(
 
 async def get_available_teams_by_season_and_week(
     db_session: AsyncSession, season: int, week: int
-) -> None:
-    pass
+) -> Sequence[str]:
+    unique_teams = await db_session.execute(
+        select(distinct(LeagueDeck.team_name)).where(
+            LeagueDeck.season == season, LeagueDeck.week == week
+        )
+    )
+    return unique_teams.scalars().all()
