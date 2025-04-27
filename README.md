@@ -21,3 +21,8 @@
   - [ ] With the parameters of season, week, and team_name
   - [ ] Autocomplete for parameters
   - [ ] Output should have submitter, player, and deck preview details
+
+### misc
+
+- [ ] add docker
+- [ ] add github info

@@ -1,5 +1,7 @@
 import io
 
+import aiofiles
+import discord
 from sqlalchemy import delete, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -84,3 +86,11 @@ async def get_deck_image_buffer(deck_ydk_content: str) -> io.BytesIO:
 
     decklist = decklist_processor.create_decklist(deck_ydk_content)
     return await deck_imager.generate_deck_image(decklist)
+
+
+async def save_deck_attachment(attachment: discord.Attachment, filename: str) -> None:
+    """Save deck image locally"""
+    image_bytes = await attachment.read()
+
+    async with aiofiles.open(filename, "wb") as f:
+        await f.write(image_bytes)
