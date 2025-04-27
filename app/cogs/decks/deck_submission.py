@@ -1,11 +1,16 @@
 import asyncio
+import uuid
 
 import discord
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cogs.decks.config import DeckSettings
-from app.cogs.decks.utils import get_deck_image_buffer, has_team_submitted
+from app.cogs.decks.utils import (
+    get_deck_image_buffer,
+    has_team_submitted,
+    save_deck_attachment,
+)
 from app.core.exceptions import UserCancelled, UserRetry
 from app.core.models import LeagueDeck, LeagueSetting
 
@@ -101,6 +106,11 @@ class DeckSubmissionSession:
         if not isinstance(confirmed_deck_attachment, discord.Attachment):
             raise UserRetry(f"User requested to retry deck {index}.")
 
+        # Save deck image locally
+        deck_image_filename = f"{uuid.uuid4()}.webp"
+        deck_image_path = f"data/decks/{deck_image_filename}"
+        await save_deck_attachment(confirmed_deck_attachment, deck_image_path)
+
         return LeagueDeck(
             season=self.league_settings.current_season,
             week=self.league_settings.current_week,
@@ -113,6 +123,7 @@ class DeckSubmissionSession:
             deck_filename=deck_file_attachment.filename,
             deck_ydk_url=deck_file_attachment.url,
             deck_image_url=confirmed_deck_attachment.url,
+            deck_image_path=deck_image_path,
             deck_ydk_content=deck_ydk_content,
         )
 
@@ -168,14 +179,7 @@ class DeckSubmissionSession:
             file=deck_image_file,
         )
 
-        retries = 0
-        max_retries = 3
-
         while True:
-            if retries == max_retries:
-                await self.dm_channel.send("❗ **Maximum number of retries met.")
-                return None
-
             confirmation = await self._ask("Type `yes` to confirm or `no` to retry.")
 
             if confirmation.content.lower() in ("yes", "y"):
@@ -184,8 +188,7 @@ class DeckSubmissionSession:
             if confirmation.content.lower() in ("no", "n"):
                 return None
 
-            await self.dm_channel.send("❗ **Invalid response.**\n")
-            retries += 1
+            await self.dm_channel.send("❗ **Invalid response.**")
 
     async def _ask(self, prompt: str, add_reminder: bool = True) -> discord.Message:
         assert self.dm_channel is not None

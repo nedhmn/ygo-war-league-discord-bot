@@ -49,4 +49,5 @@ class LeagueDeck(BaseModel):
     deck_filename: Mapped[str] = mapped_column(String, nullable=False)
     deck_ydk_url: Mapped[str] = mapped_column(String)
     deck_image_url: Mapped[str] = mapped_column(String)
+    deck_image_path: Mapped[str] = mapped_column(String, nullable=False)
     deck_ydk_content: Mapped[str] = mapped_column(String, nullable=False)
