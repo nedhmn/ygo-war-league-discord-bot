@@ -2,7 +2,7 @@ from app.core.deck_imager.models import Decklist
 from app.core.deck_imager.config import DecklistProcessorSetting
 
 
-class DeckFileProcessor:
+class DecklistProcessor:
     def __init__(self, settings: DecklistProcessorSetting):
         """Initialize with deck file processor settings"""
         self.settings = settings
@@ -17,7 +17,7 @@ class DeckFileProcessor:
 
     def _parse_deck_string(self, content: str) -> dict[str, list[str]]:
         """Parse the deck string into main, side, and extra sections with validations"""
-        sections = {"main": [], "side": [], "extra": []}
+        sections: dict[str, list[str]] = {"main": [], "side": [], "extra": []}
         current_section = None
         lines = content.splitlines()
 

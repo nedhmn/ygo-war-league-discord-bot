@@ -1,6 +1,14 @@
+import io
+
 from sqlalchemy import delete, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.deck_imager.config import (
+    deck_imager_settings,
+    decklist_processor_settings,
+)
+from app.core.deck_imager.deck_imager import DeckImager
+from app.core.deck_imager.decklist_processor import DecklistProcessor
 from app.core.models import LeagueDeck, LeagueSetting
 
 
@@ -67,3 +75,12 @@ async def load_league_decks_to_db(
 
     db_session.add_all(entries)
     await db_session.commit()
+
+
+async def get_deck_image_buffer(deck_ydk_content: str) -> io.BytesIO:
+    # Initialize processors
+    decklist_processor = DecklistProcessor(decklist_processor_settings)
+    deck_imager = DeckImager(deck_imager_settings)
+
+    decklist = decklist_processor.create_decklist(deck_ydk_content)
+    return await deck_imager.generate_deck_image(decklist)

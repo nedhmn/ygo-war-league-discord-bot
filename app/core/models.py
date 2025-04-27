@@ -47,5 +47,6 @@ class LeagueDeck(BaseModel):
     player_name: Mapped[str] = mapped_column(String, nullable=False)
     player_order: Mapped[int] = mapped_column(Integer, nullable=False)
     deck_filename: Mapped[str] = mapped_column(String, nullable=False)
-    deck_url: Mapped[str] = mapped_column(String, nullable=False)
-    deck_ydk_contents: Mapped[str] = mapped_column(String, nullable=False)
+    deck_ydk_url: Mapped[str] = mapped_column(String)
+    deck_image_url: Mapped[str] = mapped_column(String)
+    deck_ydk_content: Mapped[str] = mapped_column(String, nullable=False)

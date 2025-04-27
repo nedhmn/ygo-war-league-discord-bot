@@ -116,7 +116,7 @@ class DecksCog(commands.Cog):
             async with get_async_db_session() as db_session:
                 submission_session = DeckSubmissionSession(
                     bot=self.bot,
-                    user=interaction.user,
+                    interaction=interaction,
                     team_role=team_role,
                     db_session=db_session,
                     deck_settings=deck_settings,
