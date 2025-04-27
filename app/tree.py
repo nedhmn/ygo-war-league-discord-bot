@@ -23,6 +23,6 @@ class MyCommandTree(discord.app_commands.CommandTree):
             raise error
 
         if interaction.response.is_done():
-            await interaction.followup.send(message, ephemeral=True)
+            await interaction.followup.send(message)
         else:
-            await interaction.response.send_message(message, ephemeral=True)
+            await interaction.response.send_message(message)

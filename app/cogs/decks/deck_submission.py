@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import uuid
 
 import discord
@@ -15,8 +14,6 @@ from app.cogs.decks.utils import (
 )
 from app.core.exceptions import UserCancelled, UserRetry
 from app.core.models import LeagueDeck, LeagueSetting
-
-logger = logging.getLogger(__name__)
 
 
 class DeckSubmissionSession:
@@ -191,8 +188,11 @@ class DeckSubmissionSession:
             response = confirmation.content.lower().strip()
 
             if response in ("yes", "y"):
+                image_url = confirm_msg.embeds[0].image.url
+                assert image_url is not None
+
                 return ConfirmationDetails(
-                    url=confirm_msg.embeds[0].image.url,
+                    url=image_url,
                     image_bytes=image_buffer,
                 )
 

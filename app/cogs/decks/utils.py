@@ -2,7 +2,6 @@ import io
 from typing import Sequence
 
 import aiofiles
-import discord
 from sqlalchemy import delete, distinct, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -76,15 +76,13 @@ class DecksCog(commands.Cog):
 
         # Check if deck submissions are enabled
         if not league_settings.enable_deck_submissions:
-            await interaction.response.send_message(
-                "⚠️ Deck submissions are closed.", ephemeral=True
-            )
+            await interaction.response.send_message("⚠️ Deck submissions are closed.")
             return
 
         # Check if user has an active session
         if interaction.user.id in self.active_sessions:
             await interaction.response.send_message(
-                "⚠️ You already have an active submission session.", ephemeral=True
+                "⚠️ You already have an active submission session."
             )
             return
 
@@ -97,14 +95,14 @@ class DecksCog(commands.Cog):
         # Check if user has an authorized team role
         if not team_roles:
             await interaction.response.send_message(
-                "⚠️ You need to have a team role to submit decks.", ephemeral=True
+                "⚠️ You need to have a team role to submit decks."
             )
             return
 
         # Check if user has more than one team role
         if len(team_roles) > 1:
             await interaction.response.send_message(
-                "⚠️ You need to have only one team role to submit decks.", ephemeral=True
+                "⚠️ You need to have only one team role to submit decks."
             )
             return
 
@@ -144,12 +142,12 @@ class DecksCog(commands.Cog):
             available_seasons = await get_available_seasons(db_session)
 
         if not available_seasons:
-            interaction.response.send_message("❗ **No available seasons!**")
+            await interaction.response.send_message("❗ **No available seasons!**")
             return
 
         options = [
             discord.SelectOption(label=season, value=season)
-            for season in available_seasons
+            for season in str(available_seasons)
         ]
         season_select_view = SeasonSelectView(options)
 
