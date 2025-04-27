@@ -1,0 +1,10 @@
+services:
+  bot:
+    build:
+      context: .
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
