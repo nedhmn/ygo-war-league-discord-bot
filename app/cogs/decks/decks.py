@@ -7,7 +7,13 @@ from discord.ext import commands
 
 from app.cogs.decks.config import deck_settings
 from app.cogs.decks.deck_submission import DeckSubmissionSession
-from app.cogs.decks.utils import load_league_decks_to_db
+from app.cogs.decks.utils import (
+    get_league_settings,
+    load_league_decks_to_db,
+    update_league_deck_submission_status,
+    update_league_season,
+    update_league_week,
+)
 from app.core.db import get_async_db_session
 from app.core.exceptions import UserCancelled
 
@@ -19,32 +25,111 @@ class DecksCog(commands.Cog):
         self.bot = bot
         self.active_sessions: set[int] = set()
 
+    @app_commands.command(name="set_season", description="Sets the current season")
+    @app_commands.describe(season="The season to set")
+    @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
+    async def set_season(self, interaction: discord.Interaction, season: int) -> None:
+        async with get_async_db_session() as db_session:
+            await update_league_season(db_session, season)
+
+        await interaction.response.send_message(
+            f"✅ Season has been updated to **{season}**!"
+        )
+
+    @app_commands.command(name="set_week", description="Sets the current week")
+    @app_commands.describe(week="The week to set")
+    @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
+    async def set_week(self, interaction: discord.Interaction, week: int) -> None:
+        async with get_async_db_session() as db_session:
+            await update_league_week(db_session, week)
+
+        await interaction.response.send_message(
+            f"✅ Week has been updated to **{week}**!"
+        )
+
+    @app_commands.command(
+        name="enable_deck_submissions", description="Enables deck submissions"
+    )
+    @app_commands.describe(enable="Enable deck submissions")
+    @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
+    async def set_deck_submission_status(
+        self, interaction: discord.Interaction, enable: bool
+    ) -> None:
+        async with get_async_db_session() as db_session:
+            await update_league_deck_submission_status(db_session, enable)
+
+        await interaction.response.send_message(
+            f"✅ Deck submissions are **{'enabled' if enable else 'disabled'}**!"
+        )
+
     @app_commands.command(name="submit_decks", description="Submit decks")
     @app_commands.checks.has_any_role(*deck_settings.ALLOWED_ROLES)
     async def submit_decks(self, interaction: discord.Interaction) -> None:
+        # User is a guild member because of checks but this ensures for mypy
+        if not isinstance(interaction.user, discord.Member):
+            return
+
+        async with get_async_db_session() as db_session:
+            league_settings = await get_league_settings(db_session)
+
+        # Check if deck submissions are enabled
+        if not league_settings.enable_deck_submissions:
+            await interaction.response.send_message(
+                "⚠️ Deck submissions are closed.", ephemeral=True
+            )
+            return
+
+        # Check if user has an active session
         if interaction.user.id in self.active_sessions:
             await interaction.response.send_message(
                 "⚠️ You already have an active submission session.", ephemeral=True
             )
             return
 
+        team_roles = [
+            role
+            for role in interaction.user.roles
+            if role.id in deck_settings.TEAM_ROLES
+        ]
+
+        # Check if user has an authorized team role
+        if not team_roles:
+            await interaction.response.send_message(
+                "⚠️ You need to have a team role to submit decks.", ephemeral=True
+            )
+            return
+
+        # Check if user has more than one team role
+        if len(team_roles) > 1:
+            await interaction.response.send_message(
+                "⚠️ You need to have only one team role to submit decks.", ephemeral=True
+            )
+            return
+
+        team_role: discord.Role = team_roles[0]
         self.active_sessions.add(interaction.user.id)
         await interaction.response.send_message(
             "📬 Check your DMs to submit decks!", ephemeral=True
         )
 
-        async with get_async_db_session() as db_session:
-            session = DeckSubmissionSession(
-                self.bot, interaction.user, db_session, deck_settings
-            )
+        try:
+            async with get_async_db_session() as db_session:
+                submission_session = DeckSubmissionSession(
+                    bot=self.bot,
+                    interaction=interaction,
+                    team_role=team_role,
+                    db_session=db_session,
+                    deck_settings=deck_settings,
+                    league_settings=league_settings,
+                )
 
-            try:
-                entries = await session.run()
+                entries = await submission_session.run()
                 await load_league_decks_to_db(entries, db_session)
-            except (asyncio.TimeoutError, UserCancelled):
-                pass
-            finally:
-                self.active_sessions.remove(interaction.user.id)
+
+        except (asyncio.TimeoutError, UserCancelled):
+            pass
+        finally:
+            self.active_sessions.remove(interaction.user.id)
 
 
 async def setup(bot: commands.Bot) -> None:
