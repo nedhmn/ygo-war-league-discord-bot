@@ -4,6 +4,7 @@ from typing import Sequence
 import aiofiles
 import discord
 from sqlalchemy import delete, distinct, exists, select
+from sqlalchemy.engine import Row
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deck_imager.config import (
@@ -156,3 +157,19 @@ def create_team_decks_embed(
     embed.set_image(url=f"attachment://{deck_image_filename}")
 
     return embed
+
+
+async def get_submitted_teams(
+    db_session: AsyncSession, league_settings: LeagueSetting
+) -> Sequence[Row[tuple[int, str]]]:
+    result = await db_session.execute(
+        select(LeagueDeck.team_role_id, LeagueDeck.team_name)
+        .filter(
+            LeagueDeck.season == league_settings.current_season,
+            LeagueDeck.week == league_settings.current_week,
+        )
+        .distinct(LeagueDeck.team_role_id)
+        .order_by(LeagueDeck.team_name)
+    )
+
+    return result.all()

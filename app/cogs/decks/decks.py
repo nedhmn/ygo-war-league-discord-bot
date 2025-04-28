@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 import discord
 from discord import app_commands
@@ -10,6 +9,7 @@ from app.cogs.decks.deck_submission import DeckSubmissionSession
 from app.cogs.decks.utils import (
     get_available_seasons,
     get_league_settings,
+    get_submitted_teams,
     load_league_decks_to_db,
     update_league_deck_submission_status,
     update_league_season,
@@ -18,8 +18,6 @@ from app.cogs.decks.utils import (
 from app.cogs.decks.views import SeasonSelectView
 from app.core.db import get_async_db_session
 from app.core.exceptions import UserCancelled
-
-logger = logging.getLogger(__name__)
 
 
 class DecksCog(commands.Cog):
@@ -160,6 +158,52 @@ class DecksCog(commands.Cog):
         await interaction.response.send_message(
             content="Select a season:", view=season_select_view
         )
+
+    @app_commands.command(
+        name="get_current_week_status",
+        description="Mod only - Get current week's status",
+    )
+    @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
+    async def get_current_week_status(self, interaction: discord.Interaction) -> None:
+        # Get current league settings
+        async with get_async_db_session() as db_session:
+            league_settings = await get_league_settings(db_session)
+            submitted_teams = await get_submitted_teams(db_session, league_settings)
+
+        all_team_ids = set(deck_settings.TEAM_ROLES)
+
+        # Content for submitted temas
+        submitted_ids = {team.team_role_id for team in submitted_teams}
+        submitted_list = (
+            "\n".join(f"- <@&{team.team_role_id}>" for team in submitted_teams)
+            if submitted_teams
+            else "None"
+        )
+
+        # Content for non-submitted teams
+        non_submitted_ids = all_team_ids - submitted_ids
+        non_submitted_list = (
+            "\n".join(f"- <@&{role_id}>" for role_id in sorted(non_submitted_ids))
+            if non_submitted_ids
+            else "None"
+        )
+
+        # Create current week status embed
+        embed = discord.Embed(
+            title="Current Week Status", color=discord.Color.blurple()
+        )
+        embed.description = (
+            f"**Season:** {league_settings.current_season}\n"
+            f"**Week:** {league_settings.current_week}\n"
+            f"**Submissions:** {len(submitted_ids)}/{len(all_team_ids)}"
+        )
+
+        embed.add_field(name="Submitted Teams", value=submitted_list, inline=False)
+        embed.add_field(
+            name="Non-Submitted Teams", value=non_submitted_list, inline=False
+        )
+
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
