@@ -2,6 +2,7 @@ import io
 from typing import Sequence
 
 import aiofiles
+import discord
 from sqlalchemy import delete, distinct, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -132,3 +133,26 @@ async def get_team_submission_by_season_and_week(
         .order_by(LeagueDeck.player_order)
     )
     return team_submission.scalars().all()
+
+
+def create_team_decks_embed(
+    deck: LeagueDeck, deck_image_filename: str
+) -> discord.Embed:
+    embed = discord.Embed(title="Deck Submission", color=discord.Color.blurple())
+
+    embed.description = (
+        f"**Season:** {deck.season}\n"
+        f"**Week:** {deck.week}\n"
+        f"**Submitter:** {deck.submitter_name}\n"
+        f"**Team:** {deck.team_name}"
+    )
+
+    embed.add_field(
+        name="Player Deck",
+        value=(f"**Order:** {deck.player_order}\n**Player:** {deck.player_name}"),
+        inline=False,
+    )
+
+    embed.set_image(url=f"attachment://{deck_image_filename}")
+
+    return embed

@@ -153,7 +153,9 @@ class DecksCog(commands.Cog):
         options = [
             discord.SelectOption(label=str(season)) for season in available_seasons
         ]
-        season_select_view = SeasonSelectView(options)
+        season_select_view = SeasonSelectView(
+            options, initiated_user=interaction.user.id
+        )
 
         await interaction.response.send_message(
             content="Select a season:", view=season_select_view

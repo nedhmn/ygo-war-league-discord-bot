@@ -131,8 +131,10 @@ class DeckSubmissionSession:
     async def _get_player_name(self, index: int) -> str:
         assert self.dm_channel is not None
 
-        msg = await self._ask(f"**Deck {index}**\nPlease enter the **player's name**.")
-        return msg.content.strip()
+        player_name_msg = await self._ask(
+            f"**Deck {index}**\nPlease enter the **player's name**."
+        )
+        return player_name_msg.content.strip()
 
     async def _get_deck_file_attachment(self) -> discord.Attachment:
         assert self.dm_channel is not None

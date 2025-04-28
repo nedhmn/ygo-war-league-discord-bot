@@ -1,52 +1,58 @@
 from pathlib import Path
-from typing import Any
 
 import discord
 
 from app.cogs.decks.utils import (
+    create_team_decks_embed,
     get_available_teams_by_season_and_week,
     get_available_weeks_by_season,
     get_team_submission_by_season_and_week,
 )
 from app.core.config import settings
 from app.core.db import get_async_db_session
+from app.core.views import BaseSelect, BaseSelectView
 
 
-class SeasonSelectView(discord.ui.View):
-    def __init__(self, options: list[discord.SelectOption]) -> None:
-        super().__init__()
+class SeasonSelectView(BaseSelectView):
+    def __init__(
+        self, options: list[discord.SelectOption], initiated_user: int
+    ) -> None:
+        super().__init__(initiated_user)
         self.add_item(SeasonSelect(options))
 
 
-class SeasonSelect(discord.ui.Select[Any]):
+class SeasonSelect(BaseSelect):
     def __init__(self, options: list[discord.SelectOption]) -> None:
-        super().__init__(
-            placeholder="Select a season",
-            options=options,
-        )
+        super().__init__(placeholder="Select a season", options=options)
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        assert isinstance(self.view, SeasonSelectView)
+        await self.disable_view(interaction)
+
         selected_season = int(self.values[0])
+
         async with get_async_db_session() as db_session:
             available_weeks = await get_available_weeks_by_season(
                 db_session, selected_season
             )
 
         options = [discord.SelectOption(label=str(week)) for week in available_weeks]
-        week_select_view = WeekSelectView(options, selected_season)
-
-        await interaction.response.send_message(
-            content="Select a week:", view=week_select_view
+        week_select_view = WeekSelectView(
+            options, self.view.initiated_user, selected_season
         )
 
+        await interaction.followup.send(content="Select a week:", view=week_select_view)
 
-class WeekSelectView(discord.ui.View):
-    def __init__(self, options: list[discord.SelectOption], season: int) -> None:
-        super().__init__()
+
+class WeekSelectView(BaseSelectView):
+    def __init__(
+        self, options: list[discord.SelectOption], initiated_user: int, season: int
+    ) -> None:
+        super().__init__(initiated_user)
         self.add_item(WeekSelect(options, season))
 
 
-class WeekSelect(discord.ui.Select[Any]):
+class WeekSelect(BaseSelect):
     def __init__(self, options: list[discord.SelectOption], season: int) -> None:
         super().__init__(
             placeholder="Select a week",
@@ -55,29 +61,37 @@ class WeekSelect(discord.ui.Select[Any]):
         self.season = season
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        assert isinstance(self.view, WeekSelectView)
+        await self.disable_view(interaction)
+
         selected_week = int(self.values[0])
+
         async with get_async_db_session() as db_session:
             available_teams = await get_available_teams_by_season_and_week(
                 db_session, self.season, selected_week
             )
 
         options = [discord.SelectOption(label=team) for team in available_teams]
-        team_select_view = TeamSelectView(options, self.season, selected_week)
-
-        await interaction.response.send_message(
-            content="Select a team:", view=team_select_view
+        team_select_view = TeamSelectView(
+            options, self.view.initiated_user, self.season, selected_week
         )
 
+        await interaction.followup.send(content="Select a team:", view=team_select_view)
 
-class TeamSelectView(discord.ui.View):
+
+class TeamSelectView(BaseSelectView):
     def __init__(
-        self, options: list[discord.SelectOption], season: int, week: int
+        self,
+        options: list[discord.SelectOption],
+        initiated_user: int,
+        season: int,
+        week: int,
     ) -> None:
-        super().__init__()
+        super().__init__(initiated_user)
         self.add_item(TeamSelect(options, season, week))
 
 
-class TeamSelect(discord.ui.Select[Any]):
+class TeamSelect(BaseSelect):
     def __init__(
         self, options: list[discord.SelectOption], season: int, week: int
     ) -> None:
@@ -89,6 +103,9 @@ class TeamSelect(discord.ui.Select[Any]):
         self.week = week
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        assert isinstance(self.view, TeamSelectView)
+        await self.disable_view(interaction)
+
         selected_team = self.values[0]
 
         async with get_async_db_session() as db_session:
@@ -98,34 +115,15 @@ class TeamSelect(discord.ui.Select[Any]):
 
         # Loop through each deck submission and send a formatted embed
         for deck in team_decks:
-            embed = discord.Embed(
-                title="Deck Submission", color=discord.Color.blurple()
+            deck_image_filepath = Path(deck.deck_image_path)
+            if not deck_image_filepath.is_file():
+                deck_image_filepath = settings.NO_IMAGE_FOUND_PATH
+
+            deck_image_file = discord.File(
+                deck_image_filepath, filename=deck_image_filepath.name
             )
+            submission_embed = create_team_decks_embed(deck, deck_image_filepath.name)
 
-            embed.description = (
-                f"**Season:** {deck.season}\n"
-                f"**Week:** {deck.week}\n"
-                f"**Submitter:** {deck.submitter_name}\n"
-                f"**Team:** {deck.team_name}"
+            await interaction.followup.send(
+                embed=submission_embed, file=deck_image_file
             )
-
-            embed.add_field(
-                name="Player Deck",
-                value=(
-                    f"**Order:** {deck.player_order}\n**Player:** {deck.player_name}"
-                ),
-                inline=False,
-            )
-
-            file_path = Path(deck.deck_image_path)
-            if not file_path.is_file():
-                file_path = settings.NO_IMAGE_FOUND_PATH
-
-            discord_file = discord.File(file_path, filename=file_path.name)
-            embed.set_image(url=f"attachment://{file_path.name}")
-
-            if not interaction.response.is_done():
-                await interaction.response.send_message(embed=embed, file=discord_file)
-                continue
-
-            await interaction.followup.send(embed=embed, file=discord_file)
