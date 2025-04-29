@@ -17,3 +17,7 @@ class InvalidDecklist(app_commands.AppCommandError):
     """Proxy HAT format Decklist checker for when card requests fail"""
 
     pass
+
+
+class CardImageError(app_commands.AppCommandError):
+    pass

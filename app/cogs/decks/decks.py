@@ -17,7 +17,7 @@ from app.cogs.decks.utils import (
 )
 from app.cogs.decks.views import SeasonSelectView
 from app.core.db import get_async_db_session
-from app.core.exceptions import UserCancelled
+from app.core.exceptions import CardImageError, UserCancelled
 
 
 class DecksCog(commands.Cog):
@@ -141,6 +141,8 @@ class DecksCog(commands.Cog):
 
         except (asyncio.TimeoutError, UserCancelled):
             pass
+        except CardImageError:
+            await dm_channel.send("❌ **Failed to load deck.** Notify an Admin.")
         except Exception:
             await dm_channel.send("❗ **Something went wrong.**")
         finally:

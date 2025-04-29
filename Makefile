@@ -3,8 +3,7 @@ SHELL := C:/Program Files/Git/bin/bash.exe
 
 # Linting
 lint:
-	uv run ruff check .
-	uv run ruff format .
+	bash scripts/lint.sh
 
 # Cleaning
 clean:
