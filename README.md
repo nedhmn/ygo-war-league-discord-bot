@@ -38,7 +38,7 @@ Boom! The bot should be running now.
 
 ## Update The Bot
 
-Make sure you're in the project's directory. Then shut down the previous outdated bot.
+Make sure you're in the project's directory and shut down the outdated bot.
 
 ```
 sudo docker stop hat-format-discord-bot-bot-1
@@ -82,30 +82,8 @@ To view built docker containers and their size
 sudo docker ps -a
 ```
 
-To shut down the docker container running the bot
-
-```
-sudo docker stop hat-format-docker-bot-bot-1
-```
-
 To delete all containers, images, and clear cache (reset docker)
 
 ```
 sudo docker system prune -a
-```
-
-To pull new changes to the bot
-
-```
-# Need to be in project's root directory
-git pull
-```
-
-Quick commands to update a pre-existing app
-
-```
-sudo docker stop hat-format-discord-bot-bot-1
-git pull
-sudo docker compose build
-sudo docker compose --ignore-override up -d
 ```
