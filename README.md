@@ -19,7 +19,7 @@ cd hat-format-discord-bot
 Build the docker image and container
 
 ```
-sudo docker compose build
+sudo docker compose build --no-cache
 ```
 
 To run the docker container in local (testing) enviornment:
