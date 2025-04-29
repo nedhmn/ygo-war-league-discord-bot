@@ -31,7 +31,7 @@ sudo docker compose up -d
 To run the docker container in production enviornment:
 
 ```
-sudo docker compose --ignore-override up -d
+sudo docker compose -f docker-compose.yml up -d
 ```
 
 Boom! The bot should be running now.
@@ -59,7 +59,7 @@ sudo docker compose build --no-cache
 Rerun the docker container in production mode
 
 ```
-sudo docker compose --ignore-override up -d
+sudo docker compose -f docker-compose.yml up -d
 ```
 
 ## Access Data
