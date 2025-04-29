@@ -5,8 +5,6 @@ services:
     env_file:
       - .env
     restart: always
-    environment:
-      - ENVRIONMENT=production
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs

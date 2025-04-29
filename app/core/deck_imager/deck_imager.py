@@ -1,6 +1,5 @@
 import asyncio
 import io
-import logging
 
 import httpx
 from PIL import Image
@@ -8,8 +7,6 @@ from PIL import Image
 from app.core.deck_imager.config import DeckImagerSetting
 from app.core.deck_imager.models import Decklist
 from app.core.exceptions import CardImageError
-
-logger = logging.getLogger(__name__)
 
 
 class DeckImager:
