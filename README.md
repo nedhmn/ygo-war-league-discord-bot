@@ -1,6 +1,6 @@
 # hat-format-discord-bot
 
-## Guide
+## Installation
 
 ### 1. Clone the respository
 
@@ -16,10 +16,10 @@ Make sure you're in the project's directory
 cd hat-format-discord-bot
 ```
 
-Build the docker image and container
+Build the docker image
 
 ```
-sudo docker compose build --no-cache
+sudo docker compose build
 ```
 
 To run the docker container in local (testing) enviornment:
@@ -35,6 +35,32 @@ sudo docker compose --ignore-override up -d
 ```
 
 Boom! The bot should be running now.
+
+## Update The Bot
+
+Make sure you're in the project's directory. Then shut down the previous outdated bot.
+
+```
+sudo docker stop hat-format-discord-bot-bot-1
+```
+
+Pull the latest changes from this repo
+
+```
+git pull
+```
+
+Rebuild the docker image
+
+```
+sudo docker compose build --no-cache
+```
+
+Rerun the docker container in production mode
+
+```
+sudo docker compose --ignore-override up -d
+```
 
 ## Access Data
 
