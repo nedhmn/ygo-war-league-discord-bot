@@ -1,5 +1,11 @@
 # hat-format-discord-bot
 
+## Requirements
+
+### 1. Download Docker
+
+[Docker Desktop](https://www.docker.com/products/docker-desktop/) for Windows/MacOS or [Docker Engine](https://docs.docker.com/engine/install/ubuntu/) for Linux
+
 ## Installation
 
 ### 1. Clone the respository
@@ -8,7 +14,30 @@
 git clone https://github.com/hmnned/hat-format-discord-bot
 ```
 
-### 2. Run the docker compose file
+### 2. Create .env file
+
+Use `.env.example` as a template for your `.env` file
+
+```
+cp .env.example .env
+```
+
+Edit the `.env` file to fill out these variables:
+
+```
+ENVIORNMENT=production
+BOT_TOKEN=<YOUR DISCORD BOT TOKEN>
+DATABASE_URL=sqlite+aiosqlite:///data/database.db
+
+CARD_IMAGE_BASE_URL=<YOUR CARD IMAGE BASE URL>
+CARD_IMAGE_FORMAT=<YOUR CARD IMAGE FORMAT, OR FILE TYPE>
+
+ADMIN_ROLES=<LIST OF COMMA SEPARATED ADMIN ROLE IDS>
+ALLOWED_ROLES=<LIST OF COMMA SEPARATED TEAM CAPTAIN ROLE IDS>
+TEAM_ROLES=<LIST OF COMMA SEPARATED TEAMS ROLE IDS>
+```
+
+### 3. Run the docker compose file
 
 Make sure you're in the project's directory
 
@@ -22,16 +51,10 @@ Build the docker image
 sudo docker compose build
 ```
 
-To run the docker container in local (testing) enviornment:
+To run the docker container
 
 ```
 sudo docker compose up -d
-```
-
-To run the docker container in production enviornment:
-
-```
-sudo docker compose -f docker-compose.yml up -d
 ```
 
 Boom! The bot should be running now.
@@ -56,10 +79,10 @@ Rebuild the docker image
 sudo docker compose build --no-cache
 ```
 
-Rerun the docker container in production mode
+Rerun the docker container
 
 ```
-sudo docker compose -f docker-compose.yml up -d
+sudo docker compose up -d
 ```
 
 ## Access Data
