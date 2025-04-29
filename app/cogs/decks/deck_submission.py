@@ -21,6 +21,7 @@ class DeckSubmissionSession:
         self,
         bot: commands.Bot,
         interaction: discord.Interaction,
+        dm_channel: discord.DMChannel,
         team_role: discord.Role,
         db_session: AsyncSession,
         deck_settings: DeckSettings,
@@ -28,17 +29,13 @@ class DeckSubmissionSession:
     ) -> None:
         self.bot = bot
         self.interaction = interaction
+        self.dm_channel = dm_channel
         self.team_role = team_role
         self.db_session = db_session
         self.deck_settings = deck_settings
         self.league_settings = league_settings
-        self.dm_channel: discord.DMChannel | None = None
 
     async def run(self) -> list[LeagueDeck]:
-        # Create dm with user
-        if not self.dm_channel:
-            self.dm_channel = await self.interaction.user.create_dm()
-
         # Check if team has submitted and confirm resubmission
         await self._deck_resubmission_handler()
 
@@ -53,12 +50,9 @@ class DeckSubmissionSession:
                 await self.dm_channel.send("⚠️ **Let's try that deck again.**")
                 continue
 
-        await self.dm_channel.send("✅ **All decks received. Thanks!**")
         return entries
 
     async def _deck_resubmission_handler(self) -> None:
-        assert self.dm_channel is not None
-
         team_submitted = await has_team_submitted(
             self.db_session, self.league_settings, self.team_role.id
         )
@@ -85,18 +79,16 @@ class DeckSubmissionSession:
 
             if confirmation in ("no", "n"):
                 await self.dm_channel.send(
-                    "🚫 **Submission update cancelled.** "
+                    "❌ **Submission update cancelled.** "
                     "Your previous submission remains unchanged."
                 )
                 raise UserCancelled("User chose not to update their submission.")
 
             await self.dm_channel.send(
-                "❗ **Invalid response. Please type `yes` or `no`.**"
+                "❗ **Invalid response.** Please type `yes` or `no`."
             )
 
     async def _collect_deck_entry(self, index: int) -> LeagueDeck:
-        assert self.dm_channel is not None
-
         # Get player name and deck
         player_name = await self._get_player_name(index)
         deck_file_attachment = await self._get_deck_file_attachment()
@@ -129,8 +121,6 @@ class DeckSubmissionSession:
         )
 
     async def _get_player_name(self, index: int) -> str:
-        assert self.dm_channel is not None
-
         while True:
             player_name_msg = await self._ask(
                 f"**Deck {index}**\nPlease enter the **player's name**."
@@ -144,8 +134,6 @@ class DeckSubmissionSession:
             return player_name
 
     async def _get_deck_file_attachment(self) -> discord.Attachment:
-        assert self.dm_channel is not None
-
         while True:
             file_msg = await self._ask(
                 "📎 **Upload your deck file**\nPlease attach your `.ydk` file."
@@ -170,8 +158,6 @@ class DeckSubmissionSession:
         deck_file_attachment: discord.Attachment,
         deck_ydk_content: str,
     ) -> ConfirmationDetails:
-        assert self.dm_channel is not None
-
         # Build confirmation embed
         embed = discord.Embed(
             title="Confirm Your Submission", color=discord.Color.blurple()
@@ -191,7 +177,7 @@ class DeckSubmissionSession:
                 embed.set_image(url="attachment://deck_preview.webp")
         except InvalidDecklist:
             await self.dm_channel.send(
-                "🚫 **Illegal deck.** Needs to be for HAT format."
+                "❌ **Illegal deck.** Needs to be for HAT format."
             )
             raise UserRetry
 
@@ -215,11 +201,10 @@ class DeckSubmissionSession:
                 raise UserRetry(f"User requested to retry deck {index}.")
 
             await self.dm_channel.send(
-                "❗ **Invalid response**. Please type `yes` or `no`."
+                "❗ **Invalid response.** Please type `yes` or `no`."
             )
 
     async def _ask(self, prompt: str, add_reminder: bool = True) -> discord.Message:
-        assert self.dm_channel is not None
         if add_reminder:
             prompt = (
                 prompt + "\n\n"
@@ -247,7 +232,7 @@ class DeckSubmissionSession:
 
         if msg.content.lower().strip() == "cancel":
             await self.dm_channel.send(
-                "🚫 **Submission cancelled.** You can start the process again anytime."
+                "❌ **Submission cancelled.** You can start the process again anytime."
             )
             raise UserCancelled
 

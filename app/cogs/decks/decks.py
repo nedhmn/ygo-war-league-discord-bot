@@ -115,22 +115,34 @@ class DecksCog(commands.Cog):
             "📬 Check your DMs to submit decks!", ephemeral=True
         )
 
+        # Create dm channel with submitter
+        dm_channel = await interaction.user.create_dm()
+
         try:
             async with get_async_db_session() as db_session:
                 submission_session = DeckSubmissionSession(
                     bot=self.bot,
                     interaction=interaction,
                     team_role=team_role,
+                    dm_channel=dm_channel,
                     db_session=db_session,
                     deck_settings=deck_settings,
                     league_settings=league_settings,
                 )
 
                 entries = await submission_session.run()
-                await load_league_decks_to_db(entries, db_session)
+                updated_league_settings = await get_league_settings(db_session)
+
+                if updated_league_settings.enable_deck_submissions:
+                    await load_league_decks_to_db(entries, db_session)
+                    await dm_channel.send("✅ **All decks received.** Thanks!")
+                else:
+                    await dm_channel.send("❌ **Submissions are closed.** Sorry!")
 
         except (asyncio.TimeoutError, UserCancelled):
             pass
+        except Exception:
+            await dm_channel.send("❗ **Something went wrong.**")
         finally:
             self.active_sessions.remove(interaction.user.id)
 
@@ -145,7 +157,7 @@ class DecksCog(commands.Cog):
             available_seasons = await get_available_seasons(db_session)
 
         if not available_seasons:
-            await interaction.response.send_message("❗ **No available seasons!**")
+            await interaction.response.send_message("❗ **No available seasons.**")
             return
 
         options = [
