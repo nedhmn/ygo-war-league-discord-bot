@@ -5,7 +5,7 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 export default defineConfig({
   site: "https://hmnned.github.io",
-  base: "docs",
+  base: "/ygo-war-league-discord-bot/docs",
   integrations: [
     starlight({
       title: "My Docs",
