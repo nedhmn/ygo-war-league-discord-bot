@@ -13,5 +13,4 @@ wheels/
 .ruff_cache
 *.log
 *.db
-*.webp
-!no-image.webp
+data/decks/*.webp
