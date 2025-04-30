@@ -14,10 +14,12 @@ class UserRetry(app_commands.AppCommandError):
 
 
 class InvalidDecklist(app_commands.AppCommandError):
-    """Proxy HAT format Decklist checker for when card requests fail"""
+    """Raised when a deck's ydk contents fails Decklist validation."""
 
     pass
 
 
 class CardImageError(app_commands.AppCommandError):
+    """Raised when DeckImager cannot successfully request a card image."""
+
     pass

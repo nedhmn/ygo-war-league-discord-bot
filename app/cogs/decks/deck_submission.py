@@ -176,9 +176,7 @@ class DeckSubmissionSession:
                 deck_image_file = discord.File(image_buffer, "deck_preview.webp")
                 embed.set_image(url="attachment://deck_preview.webp")
         except InvalidDecklist:
-            await self.dm_channel.send(
-                "❌ **Illegal deck.** Needs to be for HAT format."
-            )
+            await self.dm_channel.send("❌ **Illegal deck.**")
             raise UserRetry
 
         confirm_msg = await self.dm_channel.send(embed=embed, file=deck_image_file)

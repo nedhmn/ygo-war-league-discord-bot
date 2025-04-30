@@ -68,7 +68,7 @@ class DecksCog(commands.Cog):
         )
 
     @app_commands.command(name="submit_decks", description="Submit decks")
-    @app_commands.checks.has_any_role(*deck_settings.ALLOWED_ROLES)
+    @app_commands.checks.has_any_role(*deck_settings.TEAM_CAPTAIN_ROLES)
     async def submit_decks(self, interaction: discord.Interaction) -> None:
         # User is a guild member because of checks but this ensures for mypy
         if not isinstance(interaction.user, discord.Member):

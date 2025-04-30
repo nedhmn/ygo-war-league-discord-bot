@@ -15,7 +15,7 @@ class DeckSettings(BaseSettings):
     ADMIN_ROLES: Annotated[list[int], NoDecode] = Field(
         description="List of admin roles for deck submission",
     )
-    ALLOWED_ROLES: Annotated[list[int], NoDecode] = Field(
+    TEAM_CAPTAIN_ROLES: Annotated[list[int], NoDecode] = Field(
         description="List of allowed roles for deck submission",
     )
     TEAM_ROLES: Annotated[list[int], NoDecode] = Field(
@@ -24,7 +24,7 @@ class DeckSettings(BaseSettings):
 
     # Set roles in env as csv and parse as list
     # ref: https://docs.pydantic.dev/latest/concepts/pydantic_settings/#disabling-json-parsing
-    @field_validator("ADMIN_ROLES", "ALLOWED_ROLES", "TEAM_ROLES", mode="before")
+    @field_validator("ADMIN_ROLES", "TEAM_CAPTAIN_ROLES", "TEAM_ROLES", mode="before")
     @classmethod
     def parse_csv_to_list(cls, v: str) -> list[int]:
         return [int(x) for x in v.split(",")]
