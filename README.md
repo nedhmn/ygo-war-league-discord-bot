@@ -21,8 +21,6 @@ A Discord bot designed to streamline deck submissions for Yu-Gi-Oh! war league e
 
 ## ✨ Features in Action
 
-### Deck Submission Confirmation
-
 ### Get Team Submission Preview
 
 ![get-team-submission-preview](./docs/src/assets/guides-get-week-submission-team-submission-example.png)
