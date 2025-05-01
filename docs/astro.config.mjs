@@ -9,7 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "YGO War League Bot",
-      favicon: "favicon.ico",
+      favicon: "/favicon.ico",
       social: [
         {
           icon: "github",
@@ -21,7 +21,7 @@ export default defineConfig({
         {
           label: "Getting Started",
           items: [
-            { label: "Introduction", slug: "getting-started/overview" },
+            { label: "Introduction", slug: "getting-started/introduction" },
             { label: "Installation", slug: "getting-started/installation" },
             { label: "Configuration", slug: "getting-started/configuration" },
             {
@@ -48,22 +48,22 @@ export default defineConfig({
         {
           label: "Bot Commands",
           items: [
-            { label: "set_season", slug: "app-commands/set-season" },
-            { label: "set_week", slug: "app-commands/set-week" },
+            { label: "set_season", slug: "bot-commands/set-season" },
+            { label: "set_week", slug: "bot-commands/set-week" },
             {
               label: "enable_deck_submissions",
-              slug: "app-commands/enable-deck-submissions",
+              slug: "bot-commands/enable-deck-submissions",
             },
-            { label: "submit_decks", slug: "app-commands/submit-decks" },
+            { label: "submit_decks", slug: "bot-commands/submit-decks" },
             {
               label: "get_team_submission",
-              slug: "app-commands/get-team-submission",
+              slug: "bot-commands/get-team-submission",
             },
             {
               label: "get_current_week_status",
-              slug: "app-commands/get-current-week-status",
+              slug: "bot-commands/get-current-week-status",
             },
-            { label: "latency", slug: "app-commands/latency" },
+            { label: "latency", slug: "bot-commands/latency" },
           ],
         },
       ],

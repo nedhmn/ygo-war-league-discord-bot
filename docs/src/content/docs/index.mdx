@@ -8,10 +8,77 @@ hero:
     file: ../../assets/bot-hero.png
   actions:
     - text: Get started
-      link: getting-started/overview/
+      link: getting-started/introduction/
       icon: right-arrow
     - text: View on Github
       link: https://github.com/nedhmn/ygo-war-league-discord-bot
       icon: external
       variant: minimal
+      attrs:
+        target: _blank
 ---
+
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+## Why Use This Bot?
+
+Managing deck submissions for Yu-Gi-Oh! war leagues can be a complex and time-consuming task. This bot simplifies the process for both league organizers and participants by providing a dedicated, automated solution within your Discord server.
+
+Key benefits include:
+
+- **Efficiency:** Automates the collection and organization of deck submissions.
+- **Accuracy:** Robust validation ensures submitted `.ydk` files are in the correct format.
+- **Visibility:** Administrators can easily view submission status and access detailed deck information.
+- **Convenience:** Self-hostable with Docker for easy deployment and control.
+- **Organization:** Structures submissions by season and week for clear record-keeping.
+
+## Key Features at a Glance
+
+<CardGrid stagger>
+  <Card title="Effortless Submissions" icon="pencil">
+    Team Captains can easily submit and update decklists directly through
+    Discord commands.
+  </Card>
+  <Card title="Robust Validation" icon="check-circle">
+    Ensures submitted YDKs are valid DuelingBook deck files.
+  </Card>
+  <Card title="Admin Controls" icon="settings">
+    Administrators can manage seasons, weeks, enable submissions, and view data.
+  </Card>
+  <Card title="Automated Deck Images" icon="camera">
+    Generates visual previews of submitted decks using PIL.
+  </Card>
+  <Card title="Local Data Storage" icon="folder-open">
+    Stores submission data and images locally for easy access and management.
+  </Card>
+  <Card title="Dockerized Deployment" icon="building-house">
+    Simplified self-hosting with included Docker support.
+  </Card>
+</CardGrid>
+
+## Ready to Get Started?
+
+Our documentation will guide you through every step, from initial setup to using the bot's commands and accessing your league data.
+
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    href="/ygo-war-league-discord-bot/getting-started/installation"
+    description="Learn how to install and set up the bot on your server."
+  />
+  <LinkCard
+    title="Configuration"
+    href="/ygo-war-league-discord-bot/getting-started/configuration"
+    description="Configure your Discord bot application and environment variables."
+  />
+  <LinkCard
+    title="Bot Commands"
+    href="/ygo-war-league-discord-bot/bot-commands/set-season"
+    description="Explore the full list of available commands and their usage."
+  />
+  <LinkCard
+    title="Guides"
+    href="/ygo-war-league-discord-bot/guides/league-settings"
+    description="Find guides on managing league settings, submitting decks, and accessing data."
+  />
+</CardGrid>
