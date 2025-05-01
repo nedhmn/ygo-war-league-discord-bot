@@ -1,6 +1,57 @@
 ---
-title: Overview
-description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+title: Get Week Submissions Guide
+description: A guide for administrators on viewing submission status and details.
 ---
 
-Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+import CenteredImage from "../../../components/centered-image.astro";
+
+import CurrentWeekStatusImage from "../../../assets/guides-get-week-submissions-current-week-status.png";
+import SelectMenusImage from "../../../assets/guides-get-week-submissions-select-menus.png";
+import TeamSubmissionImage from "../../../assets/guides-get-week-submission-team-submission-example.png";
+
+This guide is for administrators and explains how to use the bot's commands to view the status of the current week's submissions and retrieve detailed information about specific team submissions. These commands provide essential observability for managing the war league.
+
+## Viewing Current Week Status
+
+### `/get_current_week_status`
+
+This app command provides a quick overview of the bot's current league settings and which teams have submitted decks for the configured season and week.
+
+- **Purpose:** To check the currently set season and week, and see a list of teams that have submitted for those settings.
+- **Usage:** `/get_current_week_status`
+- **Permissions:** Requires an administrative role as configured in the `.env` file (`ADMIN_ROLES`).
+
+<CenteredImage src={CurrentWeekStatusImage} alt="Current week status command" />
+
+The bot will respond with information including the current season, current week, and a list of teams that have successfully submitted decks for that season and week.
+
+## Retrieving Team Submissions
+
+### `/get_team_submission`
+
+This app command allows administrators to retrieve and view the detailed submission for a specific team for a chosen season and week. This command uses interactive select menus to guide you through selecting the desired submission.
+
+- **Purpose:** To view the full details of a team's submitted decks for a given season and week.
+- **Usage:** `/get_team_submission`
+- **Permissions:** Requires an administrative role as configured in the `.env` file (`ADMIN_ROLES`).
+
+**How to Use:**
+
+1.  After using the command, the bot will present a select menu prompting you to **select a Season**. The options in this menu are dynamically populated from the database and will only show seasons for which there are recorded submissions. If there are no submissions in the database, the bot will indicate that no seasons are available.
+2.  Upon selecting a season, a new select menu will appear, prompting you to **select a Week**. This menu will show only the weeks within the previously selected season that have recorded submissions.
+3.  After selecting a week, a final select menu will appear, prompting you to **select a Team**. This menu will show the names of teams that have submitted for the chosen season and week.
+
+<CenteredImage src={SelectMenusImage} alt="Select menus image" />
+
+4.  Once you select a team, the bot will display the team's submission as a series of embeds, one for each player's deck. Each embed will contain the following information:
+    - Season
+    - Week
+    - Submitter Name (the Team Captain)
+    - Team Name
+    - Player Order
+    - Player Name
+    - Player Deck Image (a rendered image of the submitted `.ydk`)
+
+<CenteredImage src={TeamSubmissionImage} alt="Team submission example" />
+
+This interactive process ensures you can easily navigate and access the specific submission data you need.
