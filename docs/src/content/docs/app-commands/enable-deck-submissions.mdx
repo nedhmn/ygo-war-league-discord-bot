@@ -1,6 +1,24 @@
 ---
-title: Overview
-description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+title: enable_deck_submissions
+description: Reference for the /enable_deck_submissions bot command.
 ---
 
-Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+Controls whether team captains are currently able to submit decks for the configured season and week. This command is used by administrators to open and close the submission window.
+
+## Usage
+
+```
+/enable_deck_submissions <enable>
+```
+
+## Arguments
+
+- `<enable>`: A **boolean** value (`True` or `False`) to enable or disable deck submissions.
+
+## Permissions
+
+This command can only be used by users with a role listed in the `ADMIN_ROLES` environment variable.
+
+## Details
+
+When this command is executed, the bot updates the `enable_deck_submissions` flag in the `league_settings` table. Team Captains attempting to use the `/submit_decks` command when this setting is `False` will be notified that submissions are currently closed.
