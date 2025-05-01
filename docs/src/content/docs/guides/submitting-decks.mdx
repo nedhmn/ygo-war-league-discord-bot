@@ -1,6 +1,67 @@
 ---
-title: Overview
-description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+title: Submitting Decks Guide
+description: A guide for Team Captains on submitting decks using the bot.
 ---
 
-Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+import CenteredImage from "../../../components/centered-image.astro";
+
+import PlayerNameImage from "../../../assets/guides-submitting-decks-player-name.png";
+import DeckFileImage from "../../../assets/guides-submitting-decks-deck-file.png";
+import ConfirmSubmissionImage from "../../../assets/guides-submitting-decks-confirm-submission.png";
+import ResubmissionImage from "../../../assets/guides-submitting-decks-resubmission.png";
+
+This guide is for Team Captains to understand and use the `/submit_decks` app command to submit their team's decklists for a war league week.
+
+## Eligibility for Submission
+
+To use the `/submit_decks` command, you must meet the following criteria:
+
+1.  You must have the **Team Captain role** (as configured by the TEAM_CAPTAIN_ROLES value in the env file).
+2.  You must be in **exactly one of the valid Team roles** (as configured by the TEAM_ROLES value in the env file). The bot uses your single team role to identify which team you are submitting for.
+3.  Deck submissions must be **enabled by an administrator** using the `/enable_deck_submissions` command.
+
+If you do not meet these requirements, the bot will inform you when you attempt to use the command.
+
+## The Submission Process
+
+Once you are eligible and use the `/submit_decks` command in a server channel where the bot is present, the bot will initiate a deck submission session by sending you a **Direct Message (DM)**. All subsequent interactions for the submission will occur within this DM conversation.
+
+### The Submission Session
+
+The bot will guide you through submitting decks for your team. In a standard production environment, you will be prompted to submit **5 player decks**. For each deck, the bot will ask for:
+
+1. **Player Name:** The name of the player submitting the deck.
+
+<CenteredImage src={PlayerNameImage} alt="Player name prompt" />
+
+2. **Decklist:** The decklist provided as a `.ydk` file.
+
+<CenteredImage src={DeckFileImage} alt="Deck image prompt" />
+
+The bot will validate your input at each step.
+
+### Deck Submission Confirmation
+
+After you provide the `.ydk` file for a player's deck, the bot will attempt to generate an image of the submitted deck using the card data from the `.ydk`. This image will be sent to you in the DM for your review and confirmation. You will be asked to confirm that the submitted deck is correct before proceeding.
+
+<CenteredImage src={ConfirmSubmissionImage} alt="Confirm submission" />
+
+## Resubmitting Decks
+
+If your team has already submitted decks for the current season and week, using the `/submit_decks` command again will initiate a resubmission process. The bot will recognize that a previous submission exists and will prompt you to confirm that you wish to overwrite the existing submission before starting the new submission session.
+
+<CenteredImage src={ResubmissionImage} alt="Resubmission confirmation" />
+
+The resubmission session follows the same flow as an initial submission.
+
+## Potential Issues During Submission
+
+While the bot includes validation, you might encounter issues during the submission process:
+
+- **Multiple Active Sessions:** The bot checks and manages active sessions to avoid a submitter from having multiple open sessions.
+- **Invalid `.ydk` File:** The bot performs checks to ensure the submitted `.ydk` file is in a valid DuelingBook format. If the file is malformed or does not meet the validation criteria, the bot will inform you of the error, and you will need to provide a corrected `.ydk`.
+- **Card Image Fetching Errors:** The bot relies on an external source (configured via `CARD_IMAGE_BASE_URL` in the `.env`) to fetch card images for generating the deck preview. If the bot is unable to fetch an image for a card in your `.ydk`, it will result in an error. This could happen if:
+  - The card ID in the `.ydk` is incorrect or unknown to the image source.
+  - The external image provider is down.
+
+If you encounter these issues, double-check your `.ydk` file and ensure the bot's configuration for card images is correct and the image source is accessible.
