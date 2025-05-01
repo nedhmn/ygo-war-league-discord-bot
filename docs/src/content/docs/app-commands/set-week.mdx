@@ -1,6 +1,24 @@
 ---
-title: Overview
-description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+title: set_week
+description: Reference for the /set_week bot command.
 ---
 
-Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+Sets the current week within the active season for the war league. This command is used by administrators to specify the current week for deck submissions and data retrieval within the currently set season.
+
+## Usage
+
+```
+/set_week <week>
+```
+
+## Arguments
+
+- `<week>`: An **integer** representing the week number you want to set as the current week.
+
+## Permissions
+
+This command can only be used by users with a role listed in the `ADMIN_ROLES` environment variable.
+
+## Details
+
+Upon successful execution, the bot will update the `current_week` value in the `league_settings` table of the database to the provided week number. This setting works in conjunction with the `current_season` to uniquely identify submission periods.
