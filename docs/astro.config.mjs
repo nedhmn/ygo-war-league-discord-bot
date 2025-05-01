@@ -9,7 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "YGO War League Bot",
-      favicon: "public/favicon.ico",
+      favicon: "/favicon.ico",
       social: [
         {
           icon: "github",
@@ -27,6 +27,21 @@ export default defineConfig({
             {
               label: "Running the Bot",
               slug: "getting-started/running-the-bot",
+            },
+          ],
+        },
+        {
+          label: "Guides",
+          items: [
+            { label: "League Settings", slug: "guides/league-settings" },
+            { label: "Submitting Decks", slug: "guides/submitting-decks" },
+            {
+              label: "Get Week Submissions",
+              slug: "guides/get-week-submissions",
+            },
+            {
+              label: "Access League Data",
+              slug: "guides/access-league-data",
             },
           ],
         },
