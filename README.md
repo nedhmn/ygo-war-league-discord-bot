@@ -42,7 +42,7 @@ cd ygo-war-league-discord-bot
 
 ### Configure Environmental Variables
 
-Copy the `.env.example` file to `.env` and fill in the required values, including your Discord Bot Token and role IDs. Refer to the [Configuration section in the documentation](https://nedhmn.github.io/ygo-war-league-discord-bot/get-started/configuration/) for detailed instructions.
+Copy the `.env.example` file to `.env` and fill in the required values, including your Discord Bot Token and role IDs. Refer to the [Configuration section in the documentation](https://nedhmn.github.io/ygo-war-league-discord-bot/getting-started/configuration/) for detailed instructions.
 
 ### Build and Run with Docker Compose
 
@@ -51,7 +51,7 @@ docker compose build
 docker compose up -d
 ```
 
-The bot should come online in your Discord server. Check the [Running the Bot section in the documentation](https://nedhmn.github.io/ygo-war-league-discord-bot/get-started/running-the-bot/) for troubleshooting steps.
+The bot should come online in your Discord server. Check the [Running the Bot section in the documentation](https://nedhmn.github.io/ygo-war-league-discord-bot/getting-started/running-the-bot/) for troubleshooting steps.
 
 ## 📄 License
 
