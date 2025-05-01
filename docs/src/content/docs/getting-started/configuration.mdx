@@ -6,6 +6,10 @@ description: Configuring the Discord bot and environment variables.
 import { Aside } from "@astrojs/starlight/components";
 import CenteredImage from "../../../components/centered-image.astro";
 
+import CreateBotImage from "../../../assets/getting-started-configuration-create-bot.png";
+import IntentsImage from "../../../assets/getting-started-configuration-intents.png";
+import BotTokenImage from "../../../assets/getting-started-configuration-bot-token.png";
+
 This section guides you through setting up your Discord bot application and configuring the necessary environment variables for the bot to run.
 
 ## Create a Discord Bot Application
@@ -17,12 +21,7 @@ If you don't already have a Discord bot application, you'll need to create one v
 3.  Click on "New Application".
 4.  Give your application a name (e.g., "Yu-Gi-Oh! War League Bot") and click "Create".
 
-<CenteredImage
-  src="/src/assets/getting-started-configuration-create-bot.png"
-  alt="create-an-application"
-  height="264"
-  width="446"
-/>
+<CenteredImage src={CreateBotImage} alt="create-an-application" />
 
 ## Configure Bot Intents and Permissions
 
@@ -35,7 +34,7 @@ Within your new application settings:
 3.  **Save Changes.**
 
 <CenteredImage
-  src="../../../assets/getting-started-configuration-intents.png"
+  src={IntentsImage}
   alt="setting-intents"
   height="390"
   width="717"
@@ -69,7 +68,7 @@ You will need your bot's unique token to connect the bot to Discord.
 3.  Click the "Reset Token" button. **Copy this token immediately and store it securely.** This token is sensitive and should not be shared publicly.
 
 <CenteredImage
-  src="/src/assets/getting-started-configuration-bot-token.png"
+  src={BotTokenImage}
   alt="setting-intents"
   height="130"
   width="714"
