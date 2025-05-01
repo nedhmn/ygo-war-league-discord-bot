@@ -9,7 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "YGO War League Bot",
-      favicon: "/favicon.ico",
+      favicon: "favicon.ico",
       social: [
         {
           icon: "github",
@@ -52,7 +52,7 @@ export default defineConfig({
             { label: "set_week", slug: "app-commands/set-week" },
             {
               label: "enable_deck_submissions",
-              slug: "app-commands/enable_deck_submissions",
+              slug: "app-commands/enable-deck-submissions",
             },
             { label: "submit_decks", slug: "app-commands/submit-decks" },
             {
