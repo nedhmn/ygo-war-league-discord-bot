@@ -45,6 +45,27 @@ export default defineConfig({
             },
           ],
         },
+        {
+          label: "Bot Commands",
+          items: [
+            { label: "set_season", slug: "app-commands/set-season" },
+            { label: "set_week", slug: "app-commands/set-week" },
+            {
+              label: "enable_deck_submissions",
+              slug: "app-commands/enable_deck_submissions",
+            },
+            { label: "submit_decks", slug: "app-commands/submit-decks" },
+            {
+              label: "get_team_submission",
+              slug: "app-commands/get-team-submission",
+            },
+            {
+              label: "get_current_week_status",
+              slug: "app-commands/get-current-week-status",
+            },
+            { label: "latency", slug: "app-commands/latency" },
+          ],
+        },
       ],
     }),
   ],
