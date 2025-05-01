@@ -1,6 +1,108 @@
 ---
-title: Placeholder
-description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce quis mollis lorem. Fusce quis tincidunt nunc. Maecenas sagittis purus ante.
+title: Configuration
+description: Configuring the Discord bot and environment variables.
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce quis mollis lorem. Fusce quis tincidunt nunc. Maecenas sagittis purus ante.
+import { Aside } from "@astrojs/starlight/components";
+import CenteredImage from "../../../components/centered-image.astro";
+
+This section guides you through setting up your Discord bot application and configuring the necessary environment variables for the bot to run.
+
+## Create a Discord Bot Application
+
+If you don't already have a Discord bot application, you'll need to create one via the Discord Developer Portal.
+
+1.  Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+2.  Log in with your Discord account.
+3.  Click on "New Application".
+4.  Give your application a name (e.g., "Yu-Gi-Oh! War League Bot") and click "Create".
+
+<CenteredImage
+  src="/src/assets/getting-started-configuration-create-bot.png"
+  alt="create-an-application"
+  height="264"
+  width="446"
+/>
+
+## Configure Bot Intents and Permissions
+
+Within your new application settings:
+
+1.  Navigate to the "Bot" tab on the left sidebar.
+2.  Under "Privileged Gateway Intents," enable the following:
+    - **SERVER MEMBERS INTENT:** Required to access information about server members.
+    - **MESSAGE CONTENT INTENT:** Required for the bot to read message content and process commands.
+3.  **Save Changes.**
+
+<CenteredImage
+  src="/src/assets/getting-started-configuration-intents.png"
+  alt="setting-intents"
+  height="390"
+  width="717"
+/>
+
+## Invite the Bot to Your Server
+
+To allow the bot to join your Discord server:
+
+1.  Navigate to the "OAuth2" tab on the left sidebar.
+2.  Scroll down to the "OAuth2 URL Generator" section.
+3.  Under "SCOPES," check the **`bot`** scope.
+4.  A "BOT PERMISSIONS" section will appear. Select the minimum required permissions for the bot to function:
+    - `Send Messages`
+    - `Send Messages in Threads`
+    - `Manage Messages`
+    - `Embed Links`
+    - `Attach Files`
+    - `Read Message History`
+    - `View Channels`
+5.  Under "INTEGRATION TYPE," select **`In-app Authorization`** (or **`Guild Install`** depending on your Discord Developer Portal version).
+6.  A generated URL will appear at the bottom of the page. Copy this URL.
+7.  Paste the URL into your web browser and follow the prompts to invite the bot to your desired server.
+
+## Obtain Your Bot Token
+
+You will need your bot's unique token to connect the bot to Discord.
+
+1.  Navigate back to the "Bot" tab in the Discord Developer Portal.
+2.  Under "Build-A-Bot," locate the "TOKEN" section.
+3.  Click the "Reset Token" button. **Copy this token immediately and store it securely.** This token is sensitive and should not be shared publicly.
+
+<CenteredImage
+  src="/src/assets/getting-started-configuration-bot-token.png"
+  alt="setting-intents"
+  height="130"
+  width="714"
+/>
+
+## Configure Environment Variables
+
+In the root directory of the cloned repository, you will find a file named `.env.example`. Rename this file to `.env`.
+
+Now, open the `.env` file in a text editor and fill in the following variables:
+
+- **`ENVIORNMENT`**:
+  - Set to `production` for a standard deployment.
+  - Set to `local` for local development or testing purposes. This may affect certain bot behaviors like submission limits.
+- **`BOT_TOKEN`**: Paste the bot token you obtained in the previous step here.
+  - Example: `BOT_TOKEN=YOUR_DISCORD_BOT_TOKEN`
+- **`DATABASE_URL`**:
+  - For the default local SQLite database, set this to: `sqlite+aiosqlite:///data/database.db`
+- **`CARD_IMAGE_BASE_URL`**: The base URL for fetching card images. This should be the part of the URL before the card ID.
+  - Example (using the structure from `images.ygoprodeck.com`): `CARD_IMAGE_BASE_URL=https://images.ygoprodeck.com/images/cards_small/`
+- **`CARD_IMAGE_FORMAT`**: The file extension for the card images.
+  - Example (using the structure from `images.ygoprodeck.com`): `CARD_IMAGE_FORMAT=.jpg`
+- **`ADMIN_ROLES`**: A comma-separated list of Discord role IDs that should have administrative privileges for the bot. These roles will have access to commands for configuring the league and viewing submissions.
+  - Example: `ADMIN_ROLES=1234567890,9876543210`
+- **`TEAM_CAPTAIN_ROLES`**: A comma-separated list of Discord role IDs designated as Team Captains. Only users with one of these roles and a valid `TEAM_ROLES` role can submit decks.
+  - Example: `TEAM_CAPTAIN_ROLES=1122334455,6677889900`
+- **`TEAM_ROLES`**: A comma-separated list of Discord role IDs representing the participating teams in the current season/week. Users need to have one of these roles to be eligible for submission.
+  - Example: `TEAM_ROLES=2233445566,7788990011`
+
+<Aside>
+  To get a Discord role ID, you need to have Developer Mode enabled in your
+  Discord user settings (`User Settings > Advanced > Developer Mode`). Then,
+  right-click on a role in your server and select "Copy ID".
+</Aside>
+
+Your `.env` file should now contain all the necessary configuration for the bot to connect to Discord and function correctly.
