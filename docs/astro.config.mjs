@@ -9,6 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "YGO War League Bot",
+      favicon: "public/favicon.ico",
       social: [
         {
           icon: "github",
