@@ -1,6 +1,26 @@
 ---
-title: Overview
-description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+title: latench
+description: Reference for the /latency bot command.
 ---
 
-Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+Displays the bot's current latency (ping) to the Discord API in milliseconds. This command is primarily useful for checking the bot's responsiveness.
+
+## Usage
+
+```
+/latency
+```
+
+This command is used without any arguments in a server channel.
+
+## Availability
+
+This command is only available when the bot's `ENVIORNMENT` is set to `local` in the `.env` file. If the bot is running in `production` mode, this command will not be accessible.
+
+## Permissions
+
+This command can be used by **anyone** in a server where the bot is present when running in `local` environment.
+
+## Details
+
+Upon using this command, the bot will calculate the time it takes to receive a response from the Discord API and report that time in milliseconds. This gives an indication of the bot's current connection speed and responsiveness.
