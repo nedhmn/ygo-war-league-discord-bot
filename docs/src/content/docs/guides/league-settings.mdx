@@ -1,6 +1,47 @@
 ---
-title: Overview
-description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+title: League Settings Guide
+description: A guide to configuring season, week, and deck submission settings.
 ---
 
-Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+This guide provides a comprehensive overview of the bot's league settings and how administrators can configure them using dedicated app commands. League settings are specific to a particular season and week, influencing how deck submissions are handled and data is organized.
+
+By default, when the bot is first run, the current season and week are set to `0`, and deck submissions are disabled (`false`).
+
+## Configuring League Settings
+
+The following app commands are used by administrators to manage league settings:
+
+### `/set_season <season>`
+
+This command sets the current season for the bot. The `<season>` should be an integer representing the desired season. This value is used by the bot when processing deck submissions and accessing historical data.
+
+- **Purpose:** Changes the current active season.
+- **Usage:** `/set_season 2` (Sets the current season to 2)
+- **Permissions:** Requires an administrative role as configured in the `.env` file (`ADMIN_ROLES`).
+
+### `/set_week <week>`
+
+This command sets the current week within the active season. The `<week>` should be an integer representing the desired week. Like the season, this value is used to associate deck submissions with the correct week and season.
+
+- **Purpose:** Changes the current active week within the set season.
+- **Usage:** `/set_week 5` (Sets the current week to 5 for the currently set season)
+- **Permissions:** Requires an administrative role as configured in the `.env` file (`ADMIN_ROLES`).
+
+### `/enable_deck_submissions <enabled>`
+
+This command controls whether deck submissions are currently allowed. The `<enabled>` argument should be a boolean value (`True` or `False`).
+
+- **Purpose:** Enables or disables deck submissions for the current season and week.
+- **Usage:**
+  - `/enable_deck_submissions True` (Allows deck submissions)
+  - `/enable_deck_submissions False` (Disables deck submissions)
+- **Permissions:** Requires an administrative role as configured in the `.env` file (`ADMIN_ROLES`).
+
+## Workflow Example: Starting a New Week
+
+To start a new week in your war league using the bot, an administrator would typically follow these steps:
+
+1.  Use `/set_week` to update the current week number.
+2.  Use `/enable_deck_submissions True` to open submissions for the new week.
+
+This allows administrators to control the submission window precisely. You can also change the season and week to review or manage submissions from previous periods without allowing new submissions by ensuring `/enable_deck_submissions` is set to `False`.
