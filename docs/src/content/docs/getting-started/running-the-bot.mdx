@@ -1,0 +1,58 @@
+---
+title: Running the Bot
+description: How to build and run the Discord bot using Docker Compose.
+---
+
+import { Aside, Code } from "@astrojs/starlight/components";
+
+Once you have completed the [installation](/getting-started/installation) and [configuration](/getting-started/configuration) steps, you are ready to build and run the bot using Docker Compose.
+
+## Starting the Bot
+
+1.  **Ensure Docker is Running:**
+
+    - If you are on Windows or macOS, make sure your Docker Desktop application is open and running in the background.
+    - If you are on Linux using Docker Engine, the Docker daemon should typically be running automatically. You can check its status with `sudo systemctl status docker`.
+
+2.  **Navigate to the Bot's Directory:**
+    Open your terminal or command prompt and navigate to the root directory of the bot's repository (the directory where you cloned the code and created the `.env` file).
+
+3.  **Build the Docker Image:**
+    Build the Docker image for the bot. This process compiles the necessary code and dependencies into a container image.
+
+    <Code code="docker compose build" lang="bash" />
+
+4.  **Run the Docker Container:**
+    Start the bot's container in detached mode (`-d`), which means it will run in the background without occupying your terminal.
+
+    <Code code="docker compose up -d" lang="bash" />
+
+    You should now see the bot come online in your Discord server within a short time.
+
+## Troubleshooting
+
+If the bot does not come online or you encounter issues, here are some helpful commands and steps:
+
+- **Check Container Status:** See a list of all containers on your system and their status (running, exited, etc.).
+
+  <Code code="docker ps -a" lang="bash" />
+
+- **View Bot Logs:** Check the bot's output for any errors or messages. You can view the logs in two ways:
+
+  - **Local Log File:** By default, the bot logs to a file at `/logs/bot.log` within the container.
+  - **Docker Logs:** View the standard output and error streams of the running container.
+
+    <Code code="docker logs ygo-war-league-discord-bot-bot-1" lang="bash" />
+
+- **Clean Docker System:** This command will remove all stopped containers, all networks not used by at least one container, all dangling images, and optionally all build cache.
+
+  <Code code="docker system prune -a" lang="bash" />
+
+  ***
+
+  <Aside type="caution">
+    Be extremely cautious with this command if you have other Docker containers
+    or images on your system, as it will remove them.
+  </Aside>
+
+By following these steps, you should have your Yu-Gi-Oh! War League Deck Submission Bot up and running.

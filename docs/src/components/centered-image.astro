@@ -1,0 +1,9 @@
+---
+import { Image } from "astro:assets";
+
+const { src, alt, top = 40, bottom = 40, height, width } = Astro.props;
+---
+
+<div style={{ marginTop: `${top}px`, marginBottom: `${bottom}px`, textAlign: 'center' }}>
+  <Image src={src} alt={alt} height={height} width={width} style="margin: 0 auto; display: block;"/>
+</div>

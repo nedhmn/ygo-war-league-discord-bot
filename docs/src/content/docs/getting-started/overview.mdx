@@ -1,0 +1,29 @@
+---
+title: Overview
+description: An overview of the Yu-Gi-Oh! War League Deck Submission Bot.
+---
+
+Welcome to the documentation for the Yu-Gi-Oh! War League Deck Submission Bot.
+
+This bot is a powerful tool designed to streamline the process of managing deck submissions for team-based war league events within Yu-Gi-Oh! communities on Discord. Built with Python and the [discord.py](https://discordpy.readthedocs.io/en/stable/) library, it provides a robust platform for participants to submit and manage their decklists, and for administrators to oversee the league.
+
+## Key Features:
+
+- **Effortless Deck Submission:** Users can easily submit and update their decklists by providing a `.ydk` file.
+- **Robust YDK Validation:** The bot includes basic validation to ensure submitted `.ydk` files are valid DuelingBook decks, preventing errors and ensuring data integrity.
+- **Administrator Controls:** Dedicated commands allow league administrators to configure seasons and weeks, view and manage submissions, and maintain control over the league's data.
+- **Local Data Storage:** All submission data, including team assignments and decklist information, is persistently stored in a local `sqlite3` database by default.
+- **Automated Deck Image Generation:** The bot automatically generates visual representations of submitted decks using the [PIL](https://pypi.org/project/pillow/) library, saving them locally for easy review.
+- **Multi-Season and Multi-Week Support:** The bot is designed to handle multiple war league seasons and any number of individual weeks within those seasons, offering flexibility for ongoing events.
+
+## Technologies Used:
+
+- **Python:** The core programming language.
+- **discord.py:** A modern, easy-to-use, feature-rich, and async-ready API wrapper for Discord.
+- **SQLite3:** The default database for storing bot data.
+- **PIL (Pillow):** Used for generating deck images.
+- **Docker:** For containerization and simplified deployment.
+
+This bot aims to simplify the organizational overhead of running Yu-Gi-Oh! war leagues, allowing communities to focus on the matches themselves. The built-in validation ensures that the submitted data is reliable and in the correct format.
+
+Find the bot's code repository [here](https://github.com/nedhmn/ygo-war-league-discord-bot).
