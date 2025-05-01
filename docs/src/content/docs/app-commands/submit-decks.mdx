@@ -1,0 +1,58 @@
+---
+title: submit_decks
+description: Reference for the /submit_decks bot command for Team Captains.
+---
+
+Initiates a deck submission session for a team captain to submit their team's decklists for the current war league week and season. This command is designed to be used by authorized Team Captains.
+
+## Usage
+
+```
+/submit_decks
+```
+
+This command is used without any arguments in the server channel. The interaction then moves to a Direct Message (DM) conversation with the bot.
+
+## Permissions
+
+This command can only be used by users who meet the following criteria:
+
+1.  The user has a role listed in the `TEAM_CAPTAIN_ROLES` environment variable.
+2.  The user has exactly **one** role listed in the `TEAM_ROLES` environment variable. This single team role is used by the bot to identify which team the captain is submitting for.
+3.  Deck submissions are currently enabled by an administrator using the `/enable_deck_submissions` command.
+
+If you do not meet these requirements, the bot will respond in the server channel explaining why you cannot use the command.
+
+## The Submission Session (in DMs)
+
+Upon successfully using the `/submit_decks` command in a server channel, the bot will send you a Direct Message (DM) to begin the deck submission session. All subsequent interactions for submitting decks will take place in this private conversation with the bot.
+
+During the session, the bot will guide you through submitting decks for your team. You will be prompted to provide the following information for each player's deck:
+
+1.  **Player Name:** The name of the player associated with the deck (as a text input).
+2.  **Player Deck (.ydk file):** The decklist provided as a `.ydk` file. You will be prompted to upload the `.ydk` file.
+
+The bot will collect submissions for the configured number of players per team (typically 5 in a production environment).
+
+### Deck Image Confirmation
+
+After you upload a `.ydk` file for a player's deck, the bot will attempt to generate a visual representation of that deck. This generated deck image will be sent back to you in the DM. You will then be asked to confirm if the submitted deck and its preview are correct before moving on to the next player's submission.
+
+## Saving Submissions
+
+Once all required player decks have been successfully submitted and confirmed, the bot will save the submission data and generated deck images:
+
+- **Deck Images:** The generated deck images are saved locally to the `./data/decks/` directory with unique filenames (UUIDs) in WEBP format.
+- **Submission Data:** The details of the submission, including the player names, deck content, and paths to the generated images, are stored in the `league_decks` table within the `./data/database.db` SQLite file.
+
+If you submit decks for a team that has already submitted for the current season and week, the bot will prompt you to confirm if you wish to overwrite the previous submission before starting the new session.
+
+## Potential Errors
+
+You might encounter the following errors during the deck submission process:
+
+- **Invalid `.ydk` File:** The bot performs validation on the uploaded `.ydk` file to ensure it is a valid DuelingBook Yu-Gi-Oh! deck format. If the file is malformed or doesn't pass validation, the bot will raise an error, and you'll need to provide a corrected `.ydk`.
+- **Card Image Fetching Failed:** The bot needs to fetch card images from the configured `CARD_IMAGE_BASE_URL` to generate the deck preview. If it cannot successfully retrieve an image for a card in your deck (e.g., due to an incorrect card ID in the `.ydk`, the image source being down, or rate limits), the deck image generation will fail, preventing the submission of that specific deck.
+- **Already in an Active Session:** The bot prevents a team captain from starting multiple deck submission sessions simultaneously. If you try to use `/submit_decks` while already in an active session, the bot will inform you that you need to complete or cancel the current session first.
+
+Ensure your `.ydk` files are valid and your bot's card image configuration is correct to minimize these issues.

@@ -1,0 +1,40 @@
+---
+title: get_current_week_status
+description: Reference for the /get_current_week_status bot command for administrators.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Provides administrators with a quick overview of the bot's currently configured season and week, and lists which teams have submitted decks for those settings.
+
+## Usage
+
+```
+/get_current_week_status
+```
+
+This command is used without any arguments in a server channel.
+
+## Permissions
+
+This command can only be used by users with a role listed in the `ADMIN_ROLES` environment variable.
+
+## Details
+
+Upon using this command, the bot will report:
+
+- The current season (as set by `/set_season`).
+- The current week (as set by `/set_week`).
+- A list of teams that have successfully submitted decks for the current season and week.
+- A list of teams that have not yet submitted decks for the current season and week (inferred from the `TEAM_ROLES` configuration and recorded submissions).
+
+This command is useful for administrators to quickly check the progress of submissions for the ongoing week.
+
+<Aside>
+  You can change the current season and week using the `/set_season` and
+  `/set_week` commands to view the submission status for past weeks. However,
+  **always ensure that deck submissions are disabled (`/enable_deck_submissions
+  False`) before changing the season or week to view historical data** to
+  prevent team captains from accidentally submitting decks to an incorrect
+  season or week.
+</Aside>

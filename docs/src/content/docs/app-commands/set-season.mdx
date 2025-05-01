@@ -1,0 +1,24 @@
+---
+title: set_season
+description: Reference for the /set_season bot command.
+---
+
+Sets the current season for the war league. This command is used by administrators to indicate the current season that the bot should associate with new deck submissions and use when referencing historical data.
+
+## Usage
+
+```
+/set_season <season>
+```
+
+## Arguments
+
+- `<season>`: An **integer** representing the season number you want to set as the current season.
+
+## Permissions
+
+This command can only be used by users with a role listed in the `ADMIN_ROLES` environment variable.
+
+## Details
+
+When this command is successfully executed, the bot will update the `current_season` value in the `league_settings` table of the database to the provided season number. Subsequent deck submissions and data lookups will use this new season value.

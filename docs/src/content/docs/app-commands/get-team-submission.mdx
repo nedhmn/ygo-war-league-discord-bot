@@ -1,0 +1,42 @@
+---
+title: get_team_submission
+description: Reference for the /get_team_submissions bot command for administrators.
+---
+
+Allows administrators to retrieve and view the detailed deck submissions for a specific team for a chosen season and week. This command provides a way to inspect individual team submissions through an interactive selection process.
+
+## Usage
+
+```
+/get_team_submission
+```
+
+This command is used without any arguments in a server channel. The bot will then initiate an interactive sequence using select menus.
+
+## Permissions
+
+This command can only be used by users with a role listed in the `ADMIN_ROLES` environment variable.
+
+## How to Use: Interactive Selection
+
+After using the `/get_team_submission` command, the bot will guide you through selecting the submission you want to view using a series of dynamic select menus:
+
+1.  **Select a Season:** The first select menu will prompt you to choose a season. This menu is populated with all the seasons for which at least one deck submission exists in the database. If there are no deck submissions recorded, the bot will indicate that no seasons are available, and the process will end.
+2.  **Select a Week:** After selecting a season, a new select menu will appear, filtered to show only the weeks within the chosen season that have recorded deck submissions. Select the week you are interested in.
+3.  **Select a Team:** Finally, a select menu will be presented with the names of teams that have submitted decks for the selected season and week. Choose the team whose submission you want to view.
+
+## Viewing the Submission
+
+Once you have selected a season, week, and team, the bot will retrieve the corresponding submission data from the database. The submission details for each player on the team will be displayed as separate embeds in the channel where you used the command. Each embed will include:
+
+- **Season:** The season the deck was submitted for.
+- **Week:** The week within the season the deck was submitted for.
+- **Team Name:** The name of the team.
+- **Submitter Name:** The Discord name of the Team Captain who submitted the deck.
+- **Player Order:** The numerical order of the player within the team's submission.
+- **Player Name:** The name of the player.
+- **Player Deck Image:** A rendered image preview of the player's submitted deck based on the `.ydk` content.
+
+## Potential Errors
+
+- **No Submissions Available:** If the database contains no recorded deck submissions, the initial select menu for choosing a season will inform you that there are no available seasons, and you will not be able to proceed with the selection process.
