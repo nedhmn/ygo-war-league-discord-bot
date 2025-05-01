@@ -1,0 +1,70 @@
+---
+title: Access League Data Guide
+description: Where to find the bot's stored data and generated deck images.
+---
+
+This guide provides information on where the bot stores its league submission data and generated deck images when using the default local storage configurations (SQLite3 database and local file system for images).
+
+## League Submission Data
+
+The core league submission data, including information about seasons, weeks, teams, players, and their submitted decklists, is stored in a local SQLite3 database file.
+
+- **Default Location:** `./data/database.db`
+
+This file is automatically created the first time the bot is run. You can access and query this database file using any standard SQLite database tools or libraries. The database schema is defined by the following two tables:
+
+### `league_settings` Table
+
+This table stores the current administrative settings for the league.
+
+| Column Name               | Data Type  | Description                                      |
+| :------------------------ | :--------- | :----------------------------------------------- |
+| `id`                      | `VARCHAR`  | Unique identifier for the setting entry.         |
+| `created_at`              | `DATETIME` | Timestamp when the entry was created (UTC).      |
+| `updated_at`              | `DATETIME` | Timestamp when the entry was last updated (UTC). |
+| `current_season`          | `INTEGER`  | The currently configured season number.          |
+| `current_week`            | `INTEGER`  | The currently configured week number.            |
+| `enable_deck_submissions` | `BOOLEAN`  | Flag indicating if deck submissions are enabled. |
+
+### `league_decks` Table
+
+This table stores information about each submitted deck.
+
+| Column Name        | Data Type  | Description                                                                    |
+| :----------------- | :--------- | :----------------------------------------------------------------------------- |
+| `id`               | `VARCHAR`  | Unique identifier for the deck submission.                                     |
+| `created_at`       | `DATETIME` | Timestamp when the submission was created (UTC).                               |
+| `updated_at`       | `DATETIME` | Timestamp when the submission was last updated (UTC).                          |
+| `season`           | `INTEGER`  | The season the deck was submitted for.                                         |
+| `week`             | `INTEGER`  | The week within the season the deck was submitted for.                         |
+| `submitter_id`     | `INTEGER`  | The Discord ID of the Team Captain who submitted the deck.                     |
+| `submitter_name`   | `VARCHAR`  | The Discord name of the Team Captain who submitted the deck.                   |
+| `team_role_id`     | `INTEGER`  | The Discord role ID of the team the deck belongs to.                           |
+| `team_name`        | `VARCHAR`  | The name of the team the deck belongs to.                                      |
+| `player_name`      | `VARCHAR`  | The name of the player the deck belongs to.                                    |
+| `player_order`     | `INTEGER`  | The order of the player within the team's submission (1-5).                    |
+| `deck_filename`    | `VARCHAR`  | The original filename of the submitted `.ydk` file.                            |
+| `deck_ydk_url`     | `VARCHAR`  | Optional URL if the `.ydk` was submitted via a link.                           |
+| `deck_image_url`   | `VARCHAR`  | The URL where the generated deck image can be accessed (if hosted externally). |
+| `deck_image_path`  | `VARCHAR`  | The local file path to the generated deck image.                               |
+| `deck_ydk_content` | `VARCHAR`  | The raw content of the submitted `.ydk` file.                                  |
+
+## Generated Deck Images
+
+Visual representations of the submitted decks, generated from the `.ydk` files using the PIL library, are stored as image files on the local file system.
+
+- **Default Location:** `./data/decks/`
+
+Each image file in this directory is named with a unique identifier (UUID) and is saved in the WEBP format.
+
+:::note[Deck Image Cleanup]
+Ideally, in a production environment, you would implement a background job or script to periodically clean up the `./data/decks/` directory. This is because resubmissions will generate new images, and the old images will no longer be referenced in the database. Cleaning up these unreferenced images helps manage disk space. This cleanup functionality is not included by default and would need to be implemented separately.
+:::
+
+## Bot Logs
+
+The bot generates logs that can be helpful for monitoring its activity and troubleshooting issues.
+
+- **Default Location:** `./logs/bot.log`
+
+The bot is configured with file rotation for its logs. Depending on the `ENVIORNMENT` setting in your `.env` file (`production` or `local`), the logging level will be set to `INFO` or `DEBUG` respectively, providing more verbose output in `local` mode.
