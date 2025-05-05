@@ -7,6 +7,7 @@ from sqlalchemy import delete, distinct, exists, select
 from sqlalchemy.engine import Row
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.cogs.decks.models import TeamMatchup, TeamPlayer
 from app.core.deck_imager.config import (
     deck_imager_settings,
     decklist_processor_settings,
@@ -173,3 +174,62 @@ async def get_submitted_teams(
     )
 
     return result.all()
+
+
+async def get_team_matchups(
+    db_session: AsyncSession, season: int, week: int
+) -> Sequence[Row[tuple[int, str, int, str]]]:
+    result = await db_session.execute(
+        select(
+            LeagueDeck.team_role_id,
+            LeagueDeck.team_name,
+            LeagueDeck.player_order,
+            LeagueDeck.player_name,
+        )
+        .where(LeagueDeck.season == season, LeagueDeck.week == week)
+        .order_by(LeagueDeck.team_name, LeagueDeck.player_order)
+    )
+
+    return result.all()
+
+
+def group_team_matchups(
+    team_matchups: Sequence[Row[tuple[int, str, int, str]]],
+) -> dict[int, TeamMatchup]:
+    teams: dict[int, TeamMatchup] = {}
+    for team_role_id, team_name, player_order, player_name in team_matchups:
+        if team_role_id not in teams:
+            teams[team_role_id] = TeamMatchup(
+                team_role_id=team_role_id, team_name=team_name, players=[]
+            )
+        teams[team_role_id].players.append(
+            TeamPlayer(player_order=player_order, player_name=player_name)
+        )
+    return teams
+
+
+def create_team_matchups_embed(
+    team_role_id: int, teams: dict[int, TeamMatchup], interaction: discord.Interaction
+) -> discord.Embed:
+    if team_role_id in teams:
+        team_matchup = teams[team_role_id]
+        sorted_players = sorted(team_matchup.players, key=lambda x: x.player_order)
+        player_lines = "\n".join(
+            f"{player.player_order}. {player.player_name}" for player in sorted_players
+        )
+        embed = discord.Embed(
+            title=f"Team {team_matchup.team_name}",
+            description=player_lines,
+            color=discord.Color.blurple(),
+        )
+    else:
+        assert isinstance(interaction.guild, discord.Guild)
+        team_role = interaction.guild.get_role(team_role_id)
+        team_name = team_role.name if team_role else "Unknown"
+        embed = discord.Embed(
+            title=f"Team {team_name}",
+            description="No submissions!",
+            color=discord.Color.red(),
+        )
+
+    return embed

@@ -1,4 +1,8 @@
+import logging
+
 import discord
+
+logger = logging.getLogger(__name__)
 
 
 class MyCommandTree(discord.app_commands.CommandTree):
@@ -11,12 +15,14 @@ class MyCommandTree(discord.app_commands.CommandTree):
         self, interaction: discord.Interaction, error: Exception
     ) -> None:
         """App commands error handler"""
+        logger.exception("An error occured:")
+
         if isinstance(error, discord.app_commands.errors.MissingAnyRole):
             message = "❌ You don't have the required role to use this command."
         elif isinstance(error, discord.app_commands.errors.NoPrivateMessage):
             message = "❌ This command cannot be used in DMs."
         else:
-            message = "❌ An error occured!"
+            message = "❌ An unexpected error occurred."
 
         if interaction.response.is_done():
             await interaction.followup.send(message)

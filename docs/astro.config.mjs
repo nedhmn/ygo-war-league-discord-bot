@@ -60,6 +60,10 @@ export default defineConfig({
               slug: "bot-commands/get-team-submission",
             },
             {
+              label: "get_team_matchups",
+              slug: "bot-commands/get-team-matchups",
+            },
+            {
               label: "get_current_week_status",
               slug: "bot-commands/get-current-week-status",
             },
