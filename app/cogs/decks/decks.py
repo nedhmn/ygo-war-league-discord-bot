@@ -199,8 +199,8 @@ class DecksCog(commands.Cog):
 
         # Create team matchups embeds
         embeds = []
-        for team_role in deck_settings.TEAM_ROLES:
-            embed = create_team_matchups_embed(team_role, teams, interaction)
+        for team_role_id in deck_settings.TEAM_ROLES:
+            embed = create_team_matchups_embed(team_role_id, teams, interaction)
             embeds.append(embed)
 
         # Send embeds to discord in chunks of 3

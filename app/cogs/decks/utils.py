@@ -194,7 +194,7 @@ async def get_team_matchups(
 
 
 def group_team_matchups(
-    team_matchups: Sequence[tuple[int, str, int, str]],
+    team_matchups: Sequence[Row[tuple[int, str, int, str]]],
 ) -> dict[int, TeamMatchup]:
     teams: dict[int, TeamMatchup] = {}
     for team_role_id, team_name, player_order, player_name in team_matchups:
@@ -209,22 +209,23 @@ def group_team_matchups(
 
 
 def create_team_matchups_embed(
-    team_role: int, teams: dict[int, TeamMatchup], interaction: discord.Interaction
+    team_role_id: int, teams: dict[int, TeamMatchup], interaction: discord.Interaction
 ) -> discord.Embed:
-    if team_role in teams:
-        team = teams[team_role]
-        sorted_players = sorted(team.players, key=lambda x: x.player_order)
+    if team_role_id in teams:
+        team_matchup = teams[team_role_id]
+        sorted_players = sorted(team_matchup.players, key=lambda x: x.player_order)
         player_lines = "\n".join(
             f"{player.player_order}. {player.player_name}" for player in sorted_players
         )
         embed = discord.Embed(
-            title=f"Team {team.team_name}",
+            title=f"Team {team_matchup.team_name}",
             description=player_lines,
             color=discord.Color.blurple(),
         )
     else:
-        team = interaction.guild.get_role(team_role)
-        team_name = team.name if team else "Unknown"
+        assert isinstance(interaction.guild, discord.Guild)
+        team_role = interaction.guild.get_role(team_role_id)
+        team_name = team_role.name if team_role else "Unknown"
         embed = discord.Embed(
             title=f"Team {team_name}",
             description="No submissions!",
