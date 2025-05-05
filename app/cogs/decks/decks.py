@@ -7,9 +7,12 @@ from discord.ext import commands
 from app.cogs.decks.config import deck_settings
 from app.cogs.decks.deck_submission import DeckSubmissionSession
 from app.cogs.decks.utils import (
+    create_team_matchups_embed,
     get_available_seasons,
     get_league_settings,
     get_submitted_teams,
+    get_team_matchups,
+    group_team_matchups,
     load_league_decks_to_db,
     update_league_deck_submission_status,
     update_league_season,
@@ -18,6 +21,7 @@ from app.cogs.decks.utils import (
 from app.cogs.decks.views import SeasonSelectView
 from app.core.db import get_async_db_session
 from app.core.exceptions import CardImageError, UserCancelled
+from app.core.utils import chunk_list
 
 
 class DecksCog(commands.Cog):
@@ -172,6 +176,38 @@ class DecksCog(commands.Cog):
         await interaction.response.send_message(
             content="Select a season:", view=season_select_view
         )
+
+    @app_commands.command(
+        name="get_team_matchups",
+        description="Mod only - Get the player order of teams by week",
+    )
+    @app_commands.checks.has_any_role(*deck_settings.ADMIN_ROLES)
+    async def get_team_matchups(
+        self, interaction: discord.Interaction, season: int, week: int
+    ) -> None:
+        async with get_async_db_session() as db_session:
+            team_matchups = await get_team_matchups(db_session, season, week)
+
+        if not team_matchups:
+            await interaction.response.send_message(
+                "No records for that season and week!"
+            )
+            return
+
+        # Transform team_matchups to loop over
+        teams = group_team_matchups(team_matchups)
+
+        # Create team matchups embeds
+        embeds = []
+        for team_role in deck_settings.TEAM_ROLES:
+            embed = create_team_matchups_embed(team_role, teams, interaction)
+            embeds.append(embed)
+
+        # Send embeds to discord in chunks of 3
+        embed_groups = list(chunk_list(embeds, 3))
+        await interaction.response.send_message(embeds=embed_groups[0])
+        for group in embed_groups[1:]:
+            await interaction.followup.send(embeds=group)
 
     @app_commands.command(
         name="get_current_week_status",
