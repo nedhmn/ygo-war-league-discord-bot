@@ -1,4 +1,4 @@
-# YGO War League Bot
+# Yu-Gi-Oh! War League Bot
 
 [![Documentation](https://img.shields.io/badge/Documentation-Link-blue)](https://nedhmn.github.io/ygo-war-league-discord-bot/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
