@@ -1,0 +1,25 @@
+---
+title: get_team_matchups
+description: Reference for the /get_team_matchups bot command.
+---
+
+Allows administrators to retrieve and view the player names, sorted by player order, per team in a week.
+
+## Usage
+
+```
+/get_team_matchups <season> <week>
+```
+
+## Arguments
+
+- `<season>`: An **integer** value of the season to filter.
+- `<week>`: An **integer** value of the week to filter.
+
+## Permissions
+
+This command can only be used by users with a role listed in the `ADMIN_ROLES` environment variable.
+
+## Details
+
+When this command is executed, the bot sends embeds of each team's player matchups, aka, the player names sorted by player order.
