@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import discord
 from discord import app_commands
@@ -18,6 +19,8 @@ from app.cogs.decks.utils import (
 from app.cogs.decks.views import SeasonSelectView
 from app.core.db import get_async_db_session
 from app.core.exceptions import CardImageError, UserCancelled
+
+logger = logging.getLogger(__name__)
 
 
 class DecksCog(commands.Cog):
@@ -142,8 +145,10 @@ class DecksCog(commands.Cog):
         except (asyncio.TimeoutError, UserCancelled):
             pass
         except CardImageError:
+            logger.exception("CardImageError occured:")
             await dm_channel.send("❌ **Failed to load deck.** Notify an Admin.")
         except Exception:
+            logger.exception("An unexpected error occurred:")
             await dm_channel.send("❗ **Something went wrong.**")
         finally:
             self.active_sessions.remove(interaction.user.id)
